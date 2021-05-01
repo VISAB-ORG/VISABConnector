@@ -63,17 +63,18 @@ namespace VISABConnector
         /// <returns>A IVISABSession object if a transmission session was openend, else null</returns>
         public static async Task<IVISABSession> InitiateSession(string game)
         {
-            if (!await IsApiReachable())
+            if (!await IsApiReachable().ConfigureAwait(false))
                 return default;
 
             var conn = new VISABSession(game, Guid.NewGuid());
-            if (await GameIsSupported(game) && await conn.OpenSession())
+            if (await GameIsSupported(game).ConfigureAwait(false)
+                && await conn.OpenSession().ConfigureAwait(false))
             {
                 conn.IsActive = true;
                 return conn;
             }
 
-            if (!await GameIsSupported(game))
+            if (!await GameIsSupported(game).ConfigureAwait(false))
                 throw new Exception($"Game[{game}] is not supported by the VISAB Api!");
 
             return default;
