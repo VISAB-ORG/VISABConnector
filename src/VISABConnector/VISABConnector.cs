@@ -38,7 +38,7 @@ namespace VISABConnector
         /// <summary>
         /// Request handler used for making Http requests
         /// </summary>
-        private static readonly IVISABRequestHandler staticRequestHandler = new VISABRequestHandler(null, Guid.Empty);
+        private static readonly IVISABRequestHandler requestHandler = new VISABRequestHandler(null, Guid.Empty);
 
         /// <summary>
         /// Indicates if the VISAB WebApi can receive data for the given game
@@ -47,12 +47,38 @@ namespace VISABConnector
         /// <returns>True if game is supported, false else</returns>
         public static async Task<bool> GameIsSupported(string game)
         {
-            var supportedGames = await staticRequestHandler.GetDeserializedResponseAsync<List<string>>(HttpMethod.Get, ENDPOINT_GAME_SUPPORTED, null, null).ConfigureAwait(false);
+            var supportedGames = await requestHandler
+                                        .GetDeserializedResponseAsync<List<string>>(HttpMethod.Get, ENDPOINT_GAME_SUPPORTED, null, null)
+                                        .ConfigureAwait(false);
 
             if (supportedGames != default)
-                return await Task.Run(() => supportedGames.Contains(game)).ConfigureAwait(false);
+                return supportedGames.Contains(game);
 
             return false;
+        }
+
+        /// <summary>
+        /// Gets the session status of for a given sessionId
+        /// </summary>
+        /// <param name="sessionId">The sessionId to check</param>
+        /// <returns></returns>
+        public static async Task<ApiResponse> GetSessionStatus(Guid sessionId)
+        {
+            var queryParameters = new List<string>
+            {
+                $"sessionid={sessionId}"
+            };
+
+            return await requestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_STATUS, queryParameters, null).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Returns a list of the sessionIds for all active sessions
+        /// </summary>
+        /// <returns>A list of the sessionIds for all active sessions</returns>
+        public static async Task<IList<Guid>> GetActiveSessions()
+        {
+            return await requestHandler.GetDeserializedResponseAsync<IList<Guid>>(HttpMethod.Get, ENDPOINT_SESSION_LIST, null, null).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -63,19 +89,21 @@ namespace VISABConnector
         /// <returns>A IVISABSession object if a transmission session was openend, else null</returns>
         public static async Task<IVISABSession> InitiateSession(string game)
         {
-            if (!await IsApiReachable().ConfigureAwait(false))
+            var pingResult = await IsApiReachable().ConfigureAwait(false);
+            if (!pingResult.IsSuccess)
                 return default;
-
-            var conn = new VISABSession(game, Guid.NewGuid());
-            if (await GameIsSupported(game).ConfigureAwait(false)
-                && await conn.OpenSession().ConfigureAwait(false))
-            {
-                conn.IsActive = true;
-                return conn;
-            }
 
             if (!await GameIsSupported(game).ConfigureAwait(false))
                 throw new Exception($"Game[{game}] is not supported by the VISAB Api!");
+
+            var session = new VISABSession(game, Guid.NewGuid());
+
+            var response = await session.OpenSession().ConfigureAwait(false);
+            if (response.IsSuccess) {
+                session.IsActive = true;
+
+                return session;
+            }
 
             return default;
         }
@@ -84,9 +112,9 @@ namespace VISABConnector
         /// Indicates if the VISAB WebApi is running
         /// </summary>
         /// <returns>True if VISAB WebApi is reachable, false else</returns>
-        public static async Task<bool> IsApiReachable()
+        public static async Task<ApiResponse> IsApiReachable()
         {
-            return await staticRequestHandler.GetSuccessResponseAsync(HttpMethod.Get, ENDPOINT_PING_TEST, null, null).ConfigureAwait(false);
+            return await requestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_PING_TEST, null, null).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -95,7 +123,7 @@ namespace VISABConnector
         /// <param name="pathToVisab">The path to the jar file</param>
         public static void StartVISAB(string pathToVisab)
         {
-            // TODO: Start VISAB
+            // TODO: Start VISAB. Can be done via setting environment variable.
             throw new NotImplementedException();
         }
     }

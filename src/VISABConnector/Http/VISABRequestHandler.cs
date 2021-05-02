@@ -29,12 +29,33 @@ namespace VISABConnector.Http
         }
 
         ///<inheritdoc/>
+        public async Task<ApiResponse> GetApiResponseAsync<TBody>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, TBody body)
+        {
+            var json = JsonConvert.SerializeObject(body);
+
+            return await GetApiResponseAsync(httpMethod, relativeUrl, queryParameters, json).ConfigureAwait(false);
+        }
+
+        ///<inheritdoc/>
+        public async Task<ApiResponse> GetApiResponseAsync(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, string body)
+        {
+            var response = await GetResponseAsync(httpMethod, relativeUrl, queryParameters, body).ConfigureAwait(false);
+            var message = await GetResponseContentAsync(response).ConfigureAwait(false);
+
+            return new ApiResponse
+            {
+                IsSuccess = response.IsSuccessStatusCode,
+                Message = message
+            };
+        }
+
+        ///<inheritdoc/>
         public async Task<TResponse> GetDeserializedResponseAsync<TResponse>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters = null, string body = null)
         {
             var jsonResponse = await GetJsonResponseAsync(httpMethod, relativeUrl, queryParameters, body).ConfigureAwait(false);
 
             if (jsonResponse != "")
-                return await Task.Run(() => JsonConvert.DeserializeObject<TResponse>(jsonResponse)).ConfigureAwait(false);
+                return JsonConvert.DeserializeObject<TResponse>(jsonResponse);
 
             return default;
         }
@@ -45,7 +66,7 @@ namespace VISABConnector.Http
             var jsonResponse = await GetJsonResponseAsync(httpMethod, relativeUrl, queryParameters, body).ConfigureAwait(false);
 
             if (jsonResponse != "")
-                return await Task.Run(() => JsonConvert.DeserializeObject<TResponse>(jsonResponse)).ConfigureAwait(false);
+                return JsonConvert.DeserializeObject<TResponse>(jsonResponse);
 
             return default;
         }
@@ -61,7 +82,7 @@ namespace VISABConnector.Http
         ///<inheritdoc/>
         public async Task<string> GetJsonResponseAsync<TBody>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, TBody body)
         {
-            var json = await Task.Run(() => JsonConvert.SerializeObject(body, serializerSettings)).ConfigureAwait(false);
+            var json = JsonConvert.SerializeObject(body, serializerSettings);
 
             return await GetJsonResponseAsync(httpMethod, relativeUrl, queryParameters, json).ConfigureAwait(false);
         }
@@ -71,13 +92,13 @@ namespace VISABConnector.Http
         {
             var response = await GetResponseAsync(httpMethod, relativeUrl, queryParameters, body).ConfigureAwait(false);
 
-            return await Task.Run(() => response.IsSuccessStatusCode).ConfigureAwait(false);
+            return response.IsSuccessStatusCode;
         }
 
         ///<inheritdoc/>
         public async Task<bool> GetSuccessResponseAsync<TBody>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, TBody body)
         {
-            var json = await Task.Run(() => JsonConvert.SerializeObject(body, serializerSettings)).ConfigureAwait(false);
+            var json = JsonConvert.SerializeObject(body, serializerSettings);
 
             return await GetSuccessResponseAsync(httpMethod, relativeUrl, queryParameters, json).ConfigureAwait(false);
         }

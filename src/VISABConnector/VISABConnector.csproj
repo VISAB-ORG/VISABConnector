@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiResponse.cs" />
     <Compile Include="AsyncHelper.cs" />
     <Compile Include="Transmission\IUnityMapInformation.cs" />
     <Compile Include="Transmission\IUnityMap.cs" />
