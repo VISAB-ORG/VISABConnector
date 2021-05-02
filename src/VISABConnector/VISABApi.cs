@@ -9,7 +9,7 @@ namespace VISABConnector
     /// <summary>
     /// Class for initializing transmission sessions and making static requests to the VISAB WebApi
     /// </summary>
-    public static class VISABConnector
+    public static class VISABApi
     {
         #region VISAB WebApi endpoints
 
