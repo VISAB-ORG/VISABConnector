@@ -13,7 +13,7 @@ namespace VISABConnector
         /// <summary>
         /// Relative endpoint for sending map images in VISAB API
         /// </summary>
-        private const string ENDPOINT_MAP = "send/map";
+        private const string ENDPOINT_MAP = "send/map/image";
 
         /// <summary>
         /// Relative endpoint for sending map information in VISAB API
