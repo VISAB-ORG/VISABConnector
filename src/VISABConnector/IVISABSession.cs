@@ -48,6 +48,14 @@ namespace VISABConnector
         Task<bool> SendMap<T>(T map) where T : IUnityMap;
 
         /// <summary>
+        /// Sends a map information object to the VISAB WebApi
+        /// </summary>
+        /// <typeparam name="T">The type inheriting IUnityMapInformation</typeparam>
+        /// <param name="mapInformation">The map information object of type T</param>
+        /// <returns>True if the map information was received by VISAB, false else</returns>
+        Task<bool> SendMapInformation<T>(T mapInformation) where T : IUnityMapInformation;
+
+        /// <summary>
         /// Sends a statistics object to the VISAB WebApi
         /// </summary>
         /// <typeparam name="T">The type inheriting IVISABStatistics</typeparam>

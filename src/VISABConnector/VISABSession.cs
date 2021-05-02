@@ -11,9 +11,14 @@ namespace VISABConnector
         #region VISAB WebApi endpoints
 
         /// <summary>
-        /// Relative endpoint for sending maps in VISAB API
+        /// Relative endpoint for sending map images in VISAB API
         /// </summary>
         private const string ENDPOINT_MAP = "send/map";
+
+        /// <summary>
+        /// Relative endpoint for sending map information in VISAB API
+        /// </summary>
+        private const string ENDPOINT_MAP_INFORMATION = "send/map/information";
 
         /// <summary>
         /// Relative endpoint for closing session in VISAB API
@@ -69,6 +74,12 @@ namespace VISABConnector
 
         ///<inheritdoc/>
         public Task<bool> SendMap<T>(T map) where T : IUnityMap
+        {
+            throw new NotImplementedException();
+        }
+
+        ///<inheritdoc/>
+        public Task<bool> SendMapInformation<T>(T mapInformation) where T : IUnityMapInformation
         {
             throw new NotImplementedException();
         }
