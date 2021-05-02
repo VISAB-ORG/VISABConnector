@@ -13,7 +13,7 @@ namespace VISABConnector
         /// <summary>
         /// Relative endpoint for sending map images in VISAB API
         /// </summary>
-        private const string ENDPOINT_MAP = "send/map/image";
+        private const string ENDPOINT_MAP_IMAGE = "send/map/image";
 
         /// <summary>
         /// Relative endpoint for sending map information in VISAB API
@@ -73,15 +73,15 @@ namespace VISABConnector
         }
 
         ///<inheritdoc/>
-        public Task<bool> SendMap<T>(T map) where T : IUnityMap
+        public async Task<bool> SendMap<T>(T map) where T : IUnityMap
         {
-            throw new NotImplementedException();
+            return await RequestHandler.GetSuccessResponseAsync(HttpMethod.Get, ENDPOINT_MAP_IMAGE, null, map).ConfigureAwait(false);
         }
 
         ///<inheritdoc/>
-        public Task<bool> SendMapInformation<T>(T mapInformation) where T : IUnityMapInformation
+        public async Task<bool> SendMapInformation<T>(T mapInformation) where T : IUnityMapInformation
         {
-            throw new NotImplementedException();
+            return await RequestHandler.GetSuccessResponseAsync(HttpMethod.Get, ENDPOINT_MAP_INFORMATION, null, mapInformation).ConfigureAwait(false);
         }
 
         ///<inheritdoc/>
