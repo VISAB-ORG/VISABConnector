@@ -10,6 +10,27 @@ namespace VISABConnector
     public interface IVISABRequestHandler
     {
         /// <summary>
+        /// Gets an ApiResponse for the given request
+        /// </summary>
+        /// <typeparam name="TBody">The type of the body</typeparam>
+        /// <param name="httpMethod">The http method used</param>
+        /// <param name="relativeUrl">The relative url to make the request to</param>
+        /// <param name="queryParameters">The query parameters</param>
+        /// <param name="body">The requests body</param>
+        /// <returns>An awaitable Task which results in an ApiResponse object</returns>
+        Task<ApiResponse> GetApiResponseAsync<TBody>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, TBody body);
+
+        /// <summary>
+        /// Gets an ApiResponse for the given request
+        /// </summary>
+        /// <param name="httpMethod">The http method used</param>
+        /// <param name="relativeUrl">The relative url to make the request to</param>
+        /// <param name="queryParameters">The query parameters</param>
+        /// <param name="body">The requests body</param>
+        /// <returns>An awaitable Task which results in an ApiResponse object</returns>
+        Task<ApiResponse> GetApiResponseAsync(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, string body);
+
+        /// <summary>
         /// Gets the deserialize response content
         /// </summary>
         /// <typeparam name="TResponse">The type to deserialize into</typeparam>

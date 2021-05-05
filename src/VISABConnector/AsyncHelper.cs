@@ -26,7 +26,7 @@ namespace VISABConnector
         /// <typeparam name="T1">The type of the first parameter</typeparam>
         /// <typeparam name="TReturn">The return type of the Func</typeparam>
         /// <param name="asyncMethod">The Func (function reference) to invoke</param>
-        /// <param name="value1">The first parameter</param>
+        /// <param name="value">The first parameter</param>
         /// <returns>The result of the Func invocation</returns>
         public static TReturn RunSynchronously<T1, TReturn>(Func<T1, Task<TReturn>> asyncMethod, T1 value)
         {

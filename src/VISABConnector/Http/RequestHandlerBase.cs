@@ -54,7 +54,7 @@ namespace VISABConnector.Http
                 return new HttpResponseMessage
                 {
                     RequestMessage = request,
-                    ReasonPhrase = $"[VISABConnector] Failed to make request to VISAB api.",
+                    ReasonPhrase = $"[VISABConnector] Failed to make request to VISAB api. Most likely VISAB WebApi isn't running.",
                     StatusCode = System.Net.HttpStatusCode.BadGateway
                 };
             }

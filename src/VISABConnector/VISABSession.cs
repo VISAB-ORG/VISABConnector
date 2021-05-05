@@ -60,40 +60,40 @@ namespace VISABConnector
         public Guid SessionId { get; }
 
         ///<inheritdoc/>
-        public async Task<bool> CloseSession()
+        public async Task<ApiResponse> CloseSession()
         {
-            await Task.Run(() => CloseSessionEvent?.Invoke(this, new ClosingEventArgs { RequestHandler = RequestHandler })).ConfigureAwait(false);
+            CloseSessionEvent?.Invoke(this, new ClosingEventArgs { RequestHandler = RequestHandler });
 
-            var closed = await RequestHandler.GetSuccessResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_CLOSE, null, null).ConfigureAwait(false);
+            var response = await RequestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_CLOSE, null, null).ConfigureAwait(false);
 
-            if (closed)
+            if (response.IsSuccess)
                 IsActive = false;
 
-            return closed;
+            return response;
         }
 
         ///<inheritdoc/>
-        public async Task<bool> SendMap<T>(T map) where T : IUnityMap
+        public async Task<ApiResponse> SendMap<T>(T map) where T : IUnityMap
         {
-            return await RequestHandler.GetSuccessResponseAsync(HttpMethod.Get, ENDPOINT_MAP_IMAGE, null, map).ConfigureAwait(false);
+            return await RequestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_MAP_IMAGE, null, map).ConfigureAwait(false);
         }
 
         ///<inheritdoc/>
-        public async Task<bool> SendMapInformation<T>(T mapInformation) where T : IUnityMapInformation
+        public async Task<ApiResponse> SendMapInformation<T>(T mapInformation) where T : IUnityMapInformation
         {
-            return await RequestHandler.GetSuccessResponseAsync(HttpMethod.Get, ENDPOINT_MAP_INFORMATION, null, mapInformation).ConfigureAwait(false);
+            return await RequestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_MAP_INFORMATION, null, mapInformation).ConfigureAwait(false);
         }
 
         ///<inheritdoc/>
-        public async Task<bool> SendStatistics<T>(T statistics) where T : IVISABStatistics
+        public async Task<ApiResponse> SendStatistics<T>(T statistics) where T : IVISABStatistics
         {
-            return await RequestHandler.GetSuccessResponseAsync(HttpMethod.Post, ENDPOINT_STATISTICS, null, statistics).ConfigureAwait(false);
+            return await RequestHandler.GetApiResponseAsync(HttpMethod.Post, ENDPOINT_STATISTICS, null, statistics).ConfigureAwait(false);
         }
 
         ///<inheritdoc/>
-        internal async Task<bool> OpenSession()
+        internal async Task<ApiResponse> OpenSession()
         {
-            return await RequestHandler.GetSuccessResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_OPEN, null, null).ConfigureAwait(false);
+            return await RequestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_OPEN, null, null).ConfigureAwait(false);
         }
     }
 }
