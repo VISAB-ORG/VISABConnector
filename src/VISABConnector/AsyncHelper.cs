@@ -6,6 +6,7 @@ namespace VISABConnector
     /// <summary>
     /// Helper class for running asynchronous methods synchronously without deadlocking the current
     /// thread. Should be used when VISABApi has to be used in non async methods.
+    /// TODO: Should probably be removed.
     /// </summary>
     internal static class AsyncHelper
     {

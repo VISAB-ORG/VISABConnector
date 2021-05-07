@@ -44,8 +44,7 @@
   <ItemGroup>
     <Compile Include="ApiResponse.cs" />
     <Compile Include="AsyncHelper.cs" />
-    <Compile Include="Transmission\IUnityMapInformation.cs" />
-    <Compile Include="Transmission\IUnityMap.cs" />
+    <Compile Include="Transmission\IMapImage.cs" />
     <Compile Include="IVISABSession.cs" />
     <Compile Include="Serializer\DontSerialize.cs" />
     <Compile Include="Event\ClosingEventArgs.cs" />
