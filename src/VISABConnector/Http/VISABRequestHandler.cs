@@ -63,12 +63,9 @@ namespace VISABConnector.Http
         ///<inheritdoc/>
         public async Task<TResponse> GetDeserializedResponseAsync<TBody, TResponse>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, TBody body)
         {
-            var jsonResponse = await GetJsonResponseAsync(httpMethod, relativeUrl, queryParameters, body).ConfigureAwait(false);
+            var json = JsonConvert.SerializeObject(body, serializerSettings);
 
-            if (jsonResponse != "")
-                return JsonConvert.DeserializeObject<TResponse>(jsonResponse);
-
-            return default;
+            return await GetDeserializedResponseAsync<TResponse>(httpMethod, relativeUrl, queryParameters, json).ConfigureAwait(false);
         }
 
         ///<inheritdoc/>
