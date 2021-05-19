@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using VISABConnector.Http;
 
@@ -58,6 +59,21 @@ namespace VISABConnector
         }
 
         /// <summary>
+        /// Returns a list of the sessionIds for all active sessions
+        /// </summary>
+        /// <returns>A list of the sessionIds for all active sessions</returns>
+        public static async Task<IList<Guid>> GetActiveSessions()
+        {
+            return await requestHandler.GetDeserializedResponseAsync<IList<Guid>>(HttpMethod.Get, ENDPOINT_SESSION_LIST, null, null).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Gets the current Version of the VISABConnector
+        /// </summary>
+        /// <returns>The Version of the VISABConnector</returns>
+        public static Version GetConnectorVersion() => Assembly.GetExecutingAssembly().GetName().Version;
+
+        /// <summary>
         /// Gets the session status of for a given sessionId
         /// </summary>
         /// <param name="sessionId">The sessionId to check</param>
@@ -70,15 +86,6 @@ namespace VISABConnector
             };
 
             return await requestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_STATUS, queryParameters, null).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Returns a list of the sessionIds for all active sessions
-        /// </summary>
-        /// <returns>A list of the sessionIds for all active sessions</returns>
-        public static async Task<IList<Guid>> GetActiveSessions()
-        {
-            return await requestHandler.GetDeserializedResponseAsync<IList<Guid>>(HttpMethod.Get, ENDPOINT_SESSION_LIST, null, null).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -99,7 +106,8 @@ namespace VISABConnector
             var session = new VISABSession(game, Guid.NewGuid());
 
             var response = await session.OpenSession().ConfigureAwait(false);
-            if (response.IsSuccess) {
+            if (response.IsSuccess)
+            {
                 session.IsActive = true;
 
                 return session;
