@@ -66,7 +66,7 @@ namespace VISABConnector
 
             HostName = hostName;
             Port = port;
-            BaseAdress = hostName.EndsWith("?") ? HostName + Port : HostName.Substring(0, HostName.Length - 1) + Port;
+            BaseAdress = hostName.EndsWith(":") ? HostName + Port : HostName + ":" + Port;
             SessionIndependantRequestHandler = new VISABRequestHandler(BaseAdress, null, Guid.Empty);
         }
 
