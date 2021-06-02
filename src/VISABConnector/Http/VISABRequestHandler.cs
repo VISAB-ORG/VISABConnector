@@ -14,9 +14,10 @@ namespace VISABConnector.Http
         /// <summary>
         /// Initializes a VISABRequestHandler object
         /// </summary>
+        /// <param name="baseAdress">The base adress of the VISAB WebApi</param>
         /// <param name="gameHeader">The game for which information will be sent</param>
         /// <param name="sessionIdHeader">The sessionId of the current tranmission session</param>
-        public VISABRequestHandler(string gameHeader, Guid sessionIdHeader) : base(Default.VISABBaseAdress)
+        public VISABRequestHandler(string baseAdress, string gameHeader, Guid sessionIdHeader) : base(baseAdress)
         {
             httpClient.DefaultRequestHeaders.Add("game", gameHeader);
             httpClient.DefaultRequestHeaders.Add("sessionid", sessionIdHeader.ToString());

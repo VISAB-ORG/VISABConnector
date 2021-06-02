@@ -8,9 +8,9 @@ using VISABConnector.Http;
 namespace VISABConnector
 {
     /// <summary>
-    /// Class for initializing transmission sessions and making static requests to the VISAB WebApi
+    /// Class for initializing transmission sessions and making requests independant of sessions to the VISAB WebApi.
     /// </summary>
-    public static class VISABApi
+    public class VISABApi
     {
         #region VISAB WebApi endpoints
 
@@ -37,18 +37,56 @@ namespace VISABConnector
         #endregion VISAB WebApi endpoints
 
         /// <summary>
-        /// Request handler used for making Http requests
+        /// The host name on which the VISAB WebApi is running.
         /// </summary>
-        private static readonly IVISABRequestHandler requestHandler = new VISABRequestHandler(null, Guid.Empty);
+        public string HostName { get; }
+
+        /// <summary>
+        /// The port on which the VISAB WebApi is running.
+        /// </summary>
+        public int Port { get; }
+
+        /// <summary>
+        /// The full base adress of the VISAB WebApi.
+        /// </summary>
+        public string BaseAdress { get; }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="hostName">The hostname of the VISAB WebAPi</param>
+        /// <param name="port">The port of the VISAB WebApi</param>
+        public VISABApi(string hostName, int port)
+        {
+            HostName = hostName;
+            if (!hostName.Contains("http"))
+                throw new ArgumentException($"Hostnames have to contain the full hostname - including http://. A valid hostname is {Default.HostName}");
+
+
+            Port = port;
+            BaseAdress = hostName.EndsWith("?") ? HostName + Port : HostName.Substring(0, HostName.Length - 1) + Port;
+            SessionIndependantRequestHandler = new VISABRequestHandler(BaseAdress, null, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Calls VISABApi(string hostName, int port) with default host name and port.
+        /// </summary>
+        public VISABApi() : this(Default.HostName, Default.Port)
+        {
+        }
+
+        /// <summary>
+        /// Request handler used for making Http requests that are independant of sessions.
+        /// </summary>
+        private IVISABRequestHandler SessionIndependantRequestHandler { get; }
 
         /// <summary>
         /// Indicates if the VISAB WebApi can receive data for the given game
         /// </summary>
         /// <param name="game">The game to check</param>
         /// <returns>True if game is supported, false else</returns>
-        public static async Task<bool> GameIsSupported(string game)
+        public async Task<bool> GameIsSupported(string game)
         {
-            var supportedGames = await requestHandler
+            var supportedGames = await SessionIndependantRequestHandler
                                         .GetDeserializedResponseAsync<List<string>>(HttpMethod.Get, ENDPOINT_GAME_SUPPORTED, null, null)
                                         .ConfigureAwait(false);
 
@@ -62,9 +100,9 @@ namespace VISABConnector
         /// Returns a list of the sessionIds for all active sessions
         /// </summary>
         /// <returns>A list of the sessionIds for all active sessions</returns>
-        public static async Task<IList<Guid>> GetActiveSessions()
+        public async Task<IList<Guid>> GetActiveSessions()
         {
-            return await requestHandler.GetDeserializedResponseAsync<IList<Guid>>(HttpMethod.Get, ENDPOINT_SESSION_LIST, null, null).ConfigureAwait(false);
+            return await SessionIndependantRequestHandler.GetDeserializedResponseAsync<IList<Guid>>(HttpMethod.Get, ENDPOINT_SESSION_LIST, null, null).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -78,14 +116,14 @@ namespace VISABConnector
         /// </summary>
         /// <param name="sessionId">The sessionId to check</param>
         /// <returns></returns>
-        public static async Task<ApiResponse> GetSessionStatus(Guid sessionId)
+        public async Task<ApiResponse> GetSessionStatus(Guid sessionId)
         {
             var queryParameters = new List<string>
             {
                 $"sessionid={sessionId}"
             };
 
-            return await requestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_STATUS, queryParameters, null).ConfigureAwait(false);
+            return await SessionIndependantRequestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_STATUS, queryParameters, null).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -94,7 +132,7 @@ namespace VISABConnector
         /// </summary>
         /// <param name="game">The game of which to sent data</param>
         /// <returns>A IVISABSession object if a transmission session was openend, else null</returns>
-        public static async Task<IVISABSession> InitiateSession(string game)
+        public async Task<IVISABSession> InitiateSession(string game)
         {
             var pingResult = await IsApiReachable().ConfigureAwait(false);
             if (!pingResult.IsSuccess)
@@ -103,7 +141,7 @@ namespace VISABConnector
             if (!await GameIsSupported(game).ConfigureAwait(false))
                 throw new Exception($"Game[{game}] is not supported by the VISAB Api!");
 
-            var session = new VISABSession(game, Guid.NewGuid());
+            var session = new VISABSession(BaseAdress, game, Guid.NewGuid());
 
             var response = await session.OpenSession().ConfigureAwait(false);
             if (response.IsSuccess)
@@ -120,9 +158,9 @@ namespace VISABConnector
         /// Indicates if the VISAB WebApi is running
         /// </summary>
         /// <returns>True if VISAB WebApi is reachable, false else</returns>
-        public static async Task<ApiResponse> IsApiReachable()
+        public async Task<ApiResponse> IsApiReachable()
         {
-            return await requestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_PING_TEST, null, null).ConfigureAwait(false);
+            return await SessionIndependantRequestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_PING_TEST, null, null).ConfigureAwait(false);
         }
 
         /// <summary>

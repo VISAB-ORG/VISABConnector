@@ -32,11 +32,16 @@ namespace VISABConnector
 
         #endregion VISAB WebApi endpoints
 
-        internal VISABSession(string game, Guid sessionId)
+        /// <summary>
+        /// </summary>
+        /// <param name="baseAdress">The base adress of VISAB</param>
+        /// <param name="game">The game of the session</param>
+        /// <param name="sessionId">The Id of the session</param>
+        internal VISABSession(string baseAdress, string game, Guid sessionId)
         {
             Game = game;
             SessionId = sessionId;
-            RequestHandler = new VISABRequestHandler(game, sessionId);
+            RequestHandler = new VISABRequestHandler(baseAdress, game, sessionId);
         }
 
         ///<inheritdoc/>

@@ -42,7 +42,7 @@ namespace VISABConnector.Http
         public async Task<HttpResponseMessage> GetResponseAsync(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters = null, string body = null)
         {
             var cts = new CancellationTokenSource();
-            cts.CancelAfter(TimeSpan.FromSeconds(Default.REQUEST_TIMEOUT));
+            cts.CancelAfter(TimeSpan.FromSeconds(Default.RequestTimeout));
 
             var request = PrepareRequest(httpMethod, relativeUrl, queryParameters, body);
             try
@@ -55,7 +55,7 @@ namespace VISABConnector.Http
                 {
                     RequestMessage = request,
                     ReasonPhrase = $"[VISABConnector] Failed to make request to VISAB api. Most likely VISAB WebApi isn't running.",
-                    StatusCode = System.Net.HttpStatusCode.BadGateway
+                    StatusCode = System.Net.HttpStatusCode.BadRequest
                 };
             }
         }
@@ -75,13 +75,16 @@ namespace VISABConnector.Http
         /// Reads the content from a HttpResponseMessage
         /// </summary>
         /// <param name="httpResponse">The HttpResponseMessage to read the content from</param>
-        /// <returns>The content as a string, empty string if request wasn't successful</returns>
+        /// <returns>The content as a string, empty string if request wasnt successful</returns>
         protected static async Task<string> GetResponseContentAsync(HttpResponseMessage httpResponse)
         {
-            if (httpResponse.IsSuccessStatusCode)
-                return await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            else
-                return "";
+            if (httpResponse.Content != null)
+            {
+                var content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                if (content != null)
+                    return content;
+            }
+            return "";
         }
 
         /// <summary>
