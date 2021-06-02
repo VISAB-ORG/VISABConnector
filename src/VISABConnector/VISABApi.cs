@@ -57,11 +57,14 @@ namespace VISABConnector
         /// <param name="port">The port of the VISAB WebApi</param>
         public VISABApi(string hostName, int port)
         {
-            HostName = hostName;
+            if (string.IsNullOrWhiteSpace(hostName))
+                throw new ArgumentException($"An empty hostname if not allowed! A valid hostname is {Default.HostName}");
+
             if (!hostName.Contains("http"))
                 throw new ArgumentException($"Hostnames have to contain the full hostname - including http://. A valid hostname is {Default.HostName}");
 
 
+            HostName = hostName;
             Port = port;
             BaseAdress = hostName.EndsWith("?") ? HostName + Port : HostName.Substring(0, HostName.Length - 1) + Port;
             SessionIndependantRequestHandler = new VISABRequestHandler(BaseAdress, null, Guid.Empty);
