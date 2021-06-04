@@ -1,24 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace VISABConnector
+﻿namespace VISABConnector
 {
     /// <summary>
-    /// Is returned when requests to the VISAB WebApi are made
+    /// Is returned when requests to the VISAB WebApi are made. <typeparamref name="T">The type of
+    /// the requests responses content.</typeparamref>
     /// </summary>
-    public class ApiResponse
+    public class ApiResponse<T>
     {
         /// <summary>
-        /// Whether the request was successfull
+        /// The content of the response.
         /// </summary>
-        public bool IsSuccess { get; set; }
+        public T Content { get; set; }
 
         /// <summary>
-        /// The message returned by VISAB WebApi
+        /// Whether the request was successful.
         /// </summary>
-        public string Message { get; set; }
+        public bool IsSuccess { get; set; }
     }
 }
