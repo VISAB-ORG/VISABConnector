@@ -6,7 +6,7 @@ using VISABConnector.Http;
 namespace VISABConnector
 {
     ///<inheritdoc cref="IVISABSession"/>
-    public class VISABSession : IVISABSession
+    internal class VISABSession : IVISABSession
     {
         #region VISAB WebApi endpoints
 
@@ -32,34 +32,31 @@ namespace VISABConnector
 
         #endregion VISAB WebApi endpoints
 
-        internal VISABSession(string game, Guid sessionId)
+        /// <summary>
+        /// </summary>
+        /// <param name="baseAdress">The base adress of VISAB</param>
+        /// <param name="game">The game of the session</param>
+        internal VISABSession(string baseAdress, string game)
         {
             Game = game;
-            SessionId = sessionId;
-            RequestHandler = new VISABRequestHandler(game, sessionId);
+            RequestHandler = new VISABRequestHandler(baseAdress, game);
         }
 
-        ///<inheritdoc/>
         public event EventHandler<ClosingEventArgs> CloseSessionEvent;
 
-        ///<inheritdoc/>
         public string Game { get; }
 
-        ///<inheritdoc/>
-        public bool IsActive { get; internal set; }
+        public bool IsActive { get; private set; }
 
-        ///<inheritdoc/>
         public IVISABRequestHandler RequestHandler { get; }
 
-        ///<inheritdoc/>
-        public Guid SessionId { get; }
+        public Guid SessionId { get; private set; }
 
-        ///<inheritdoc/>
-        public async Task<ApiResponse> CloseSession()
+        public async Task<ApiResponse<string>> CloseSession()
         {
             CloseSessionEvent?.Invoke(this, new ClosingEventArgs { RequestHandler = RequestHandler });
 
-            var response = await RequestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_CLOSE, null, null).ConfigureAwait(false);
+            var response = await RequestHandler.GetResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_CLOSE, null, null).ConfigureAwait(false);
 
             if (response.IsSuccess)
                 IsActive = false;
@@ -67,22 +64,27 @@ namespace VISABConnector
             return response;
         }
 
-        ///<inheritdoc/>
-        public async Task<ApiResponse> SendMap<T>(T map) where T : IMapImage
+        public async Task<ApiResponse<string>> SendMap<T>(T map) where T : IImage
         {
-            return await RequestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_MAP, null, map).ConfigureAwait(false);
+            return await RequestHandler.GetResponseAsync(HttpMethod.Get, ENDPOINT_MAP, null, map).ConfigureAwait(false);
         }
 
-        ///<inheritdoc/>
-        public async Task<ApiResponse> SendStatistics<T>(T statistics) where T : IVISABStatistics
+        public async Task<ApiResponse<string>> SendStatistics<T>(T statistics) where T : IVISABStatistics
         {
-            return await RequestHandler.GetApiResponseAsync(HttpMethod.Post, ENDPOINT_STATISTICS, null, statistics).ConfigureAwait(false);
+            return await RequestHandler.GetResponseAsync(HttpMethod.Post, ENDPOINT_STATISTICS, null, statistics).ConfigureAwait(false);
         }
 
-        ///<inheritdoc/>
-        internal async Task<ApiResponse> OpenSession()
+        internal async Task<bool> OpenSession()
         {
-            return await RequestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_OPEN, null, null).ConfigureAwait(false);
+            var response = await RequestHandler.GetDeserializedResponseAsync<Guid>(HttpMethod.Get, ENDPOINT_SESSION_OPEN, null, null).ConfigureAwait(false);
+            if (response.IsSuccess)
+            {
+                IsActive = true;
+                SessionId = response.Content;
+                RequestHandler.AddDefaultHeader("sessionid", SessionId);
+            }
+
+            return response.IsSuccess;
         }
     }
 }

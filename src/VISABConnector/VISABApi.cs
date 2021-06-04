@@ -8,9 +8,10 @@ using VISABConnector.Http;
 namespace VISABConnector
 {
     /// <summary>
-    /// Class for initializing transmission sessions and making static requests to the VISAB WebApi
+    /// Class for initializing transmission sessions and making requests independant of sessions to
+    /// the VISAB WebApi.
     /// </summary>
-    public static class VISABApi
+    public class VISABApi
     {
         #region VISAB WebApi endpoints
 
@@ -37,93 +38,54 @@ namespace VISABConnector
         #endregion VISAB WebApi endpoints
 
         /// <summary>
-        /// Request handler used for making Http requests
         /// </summary>
-        private static readonly IVISABRequestHandler requestHandler = new VISABRequestHandler(null, Guid.Empty);
-
-        /// <summary>
-        /// Indicates if the VISAB WebApi can receive data for the given game
-        /// </summary>
-        /// <param name="game">The game to check</param>
-        /// <returns>True if game is supported, false else</returns>
-        public static async Task<bool> GameIsSupported(string game)
+        /// <param name="hostName">The hostname of the VISAB WebAPi</param>
+        /// <param name="port">The port of the VISAB WebApi</param>
+        public VISABApi(string hostName, int port)
         {
-            var supportedGames = await requestHandler
-                                        .GetDeserializedResponseAsync<List<string>>(HttpMethod.Get, ENDPOINT_GAME_SUPPORTED, null, null)
-                                        .ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(hostName))
+                throw new ArgumentException($"An empty hostname if not allowed! A valid hostname is {Default.HostName}");
 
-            if (supportedGames != default)
-                return supportedGames.Contains(game);
+            if (!hostName.Contains("http"))
+                throw new ArgumentException($"Hostnames have to contain the full hostname - including http://. A valid hostname is {Default.HostName}");
 
-            return false;
+            HostName = hostName;
+            Port = port;
+            BaseAdress = hostName.EndsWith(":") ? HostName + Port : HostName + ":" + Port;
+            SessionIndependantRequestHandler = new VISABRequestHandler(BaseAdress, null);
         }
 
         /// <summary>
-        /// Returns a list of the sessionIds for all active sessions
+        /// Calls VISABApi(string hostName, int port) with default host name and port.
         /// </summary>
-        /// <returns>A list of the sessionIds for all active sessions</returns>
-        public static async Task<IList<Guid>> GetActiveSessions()
+        public VISABApi() : this(Default.HostName, Default.Port)
         {
-            return await requestHandler.GetDeserializedResponseAsync<IList<Guid>>(HttpMethod.Get, ENDPOINT_SESSION_LIST, null, null).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Gets the current Version of the VISABConnector
+        /// The current Version of the VISABConnector.
         /// </summary>
-        /// <returns>The Version of the VISABConnector</returns>
-        public static Version GetConnectorVersion() => Assembly.GetExecutingAssembly().GetName().Version;
+        public static Version ConnectorVersion => Assembly.GetExecutingAssembly().GetName().Version;
 
         /// <summary>
-        /// Gets the session status of for a given sessionId
+        /// The full base adress of the VISAB WebApi.
         /// </summary>
-        /// <param name="sessionId">The sessionId to check</param>
-        /// <returns></returns>
-        public static async Task<ApiResponse> GetSessionStatus(Guid sessionId)
-        {
-            var queryParameters = new List<string>
-            {
-                $"sessionid={sessionId}"
-            };
-
-            return await requestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_STATUS, queryParameters, null).ConfigureAwait(false);
-        }
+        public string BaseAdress { get; }
 
         /// <summary>
-        /// Creates a IVISABSession object, which simultaneously opens a transmission session at the
-        /// VISAB WebApi
+        /// The host name on which the VISAB WebApi is running.
         /// </summary>
-        /// <param name="game">The game of which to sent data</param>
-        /// <returns>A IVISABSession object if a transmission session was openend, else null</returns>
-        public static async Task<IVISABSession> InitiateSession(string game)
-        {
-            var pingResult = await IsApiReachable().ConfigureAwait(false);
-            if (!pingResult.IsSuccess)
-                return default;
-
-            if (!await GameIsSupported(game).ConfigureAwait(false))
-                throw new Exception($"Game[{game}] is not supported by the VISAB Api!");
-
-            var session = new VISABSession(game, Guid.NewGuid());
-
-            var response = await session.OpenSession().ConfigureAwait(false);
-            if (response.IsSuccess)
-            {
-                session.IsActive = true;
-
-                return session;
-            }
-
-            return default;
-        }
+        public string HostName { get; }
 
         /// <summary>
-        /// Indicates if the VISAB WebApi is running
+        /// The port on which the VISAB WebApi is running.
         /// </summary>
-        /// <returns>True if VISAB WebApi is reachable, false else</returns>
-        public static async Task<ApiResponse> IsApiReachable()
-        {
-            return await requestHandler.GetApiResponseAsync(HttpMethod.Get, ENDPOINT_PING_TEST, null, null).ConfigureAwait(false);
-        }
+        public int Port { get; }
+
+        /// <summary>
+        /// Request handler used for making Http requests that are independant of sessions.
+        /// </summary>
+        public IVISABRequestHandler SessionIndependantRequestHandler { get; }
 
         /// <summary>
         /// Starts the VISAB jar
@@ -133,6 +95,89 @@ namespace VISABConnector
         {
             // TODO: Start VISAB. Can be done via setting environment variable.
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Indicates if the VISAB WebApi can receive data for the given game
+        /// </summary>
+        /// <param name="game">The game to check</param>
+        /// <returns>True if game is supported, false else</returns>
+        public async Task<bool> GameIsSupported(string game)
+        {
+            var supportedGames = await SessionIndependantRequestHandler
+                                        .GetDeserializedResponseAsync<List<string>>(HttpMethod.Get, ENDPOINT_GAME_SUPPORTED, null, null)
+                                        .ConfigureAwait(false);
+
+            if (supportedGames.IsSuccess)
+                return supportedGames.Content.Contains(game);
+            else
+                return false;
+        }
+
+        /// <summary>
+        /// Returns a list of the sessionIds for all active sessions
+        /// </summary>
+        /// <returns>A list of the sessionIds for all active sessions</returns>
+        public async Task<IList<Guid>> GetActiveSessions()
+        {
+            var response = await SessionIndependantRequestHandler.GetDeserializedResponseAsync<IList<Guid>>(HttpMethod.Get, ENDPOINT_SESSION_LIST, null, null).ConfigureAwait(false);
+            if (response.IsSuccess)
+                return response.Content;
+            else
+                return new List<Guid>();
+        }
+
+        /// <summary>
+        /// Gets the session status of for a given sessionId.
+        /// TODO: Should have pojo that visab has here also.
+        /// </summary>
+        /// <param name="sessionId">The sessionId to check</param>
+        /// <returns></returns>
+        public async Task<string> GetSessionStatus(Guid sessionId)
+        {
+            var queryParameters = new List<string>
+            {
+                $"sessionid={sessionId}"
+            };
+
+            var response = await SessionIndependantRequestHandler.GetResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_STATUS, queryParameters, null).ConfigureAwait(false);
+
+            if (response.IsSuccess)
+                return response.Content;
+            else
+                return "";
+        }
+
+        /// <summary>
+        /// Creates a IVISABSession object and opens a transmission session at the VISAB WebApi.
+        /// </summary>
+        /// <param name="game">The game of which to sent data</param>
+        /// <returns>A IVISABSession object if a transmission session was openend, else null</returns>
+        public async Task<IVISABSession> InitiateSession(string game)
+        {
+            var pingResult = await IsApiReachable().ConfigureAwait(false);
+            if (!pingResult.IsSuccess)
+                return default;
+
+            if (!await GameIsSupported(game).ConfigureAwait(false))
+                throw new Exception($"Game {game} is not supported by the VISAB WebApi!");
+
+            var session = new VISABSession(BaseAdress, game);
+
+            var sessionOpened = await session.OpenSession().ConfigureAwait(false);
+            if (sessionOpened)
+                return session;
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Indicates if the VISAB WebApi is running. If the request was successful, it is running.
+        /// </summary>
+        /// <returns>An ApiResponse object</returns>
+        public async Task<ApiResponse<string>> IsApiReachable()
+        {
+            return await SessionIndependantRequestHandler.GetResponseAsync(HttpMethod.Get, ENDPOINT_PING_TEST, null, null).ConfigureAwait(false);
         }
     }
 }

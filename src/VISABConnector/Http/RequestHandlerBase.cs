@@ -12,12 +12,12 @@ namespace VISABConnector.Http
     internal class RequestHandlerBase
     {
         /// <summary>
-        /// The used HttpClient
+        /// The used HttpClient.
         /// </summary>
         protected readonly HttpClient httpClient;
 
         /// <summary>
-        /// Initializes a RequestHandlerBase instance
+        /// Initializes a RequestHandlerBase instance.
         /// </summary>
         /// <param name="baseAdress">The base adress for the HttpClient</param>
         public RequestHandlerBase(string baseAdress)
@@ -32,17 +32,17 @@ namespace VISABConnector.Http
         }
 
         /// <summary>
-        /// Makes a http request and gets the HttpResponseMessage object
+        /// Makes a http request and gets the HttpResponseMessage object.
         /// </summary>
         /// <param name="httpMethod">The http method used</param>
         /// <param name="relativeUrl">The relative url to make the request to</param>
         /// <param name="queryParameters">The query parameters</param>
         /// <param name="body">The requests body</param>
         /// <returns>The HttpResponseMessage object</returns>
-        public async Task<HttpResponseMessage> GetResponseAsync(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters = null, string body = null)
+        public async Task<HttpResponseMessage> GetHttpResponseAsync(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters = null, string body = null)
         {
             var cts = new CancellationTokenSource();
-            cts.CancelAfter(TimeSpan.FromSeconds(Default.REQUEST_TIMEOUT));
+            cts.CancelAfter(TimeSpan.FromSeconds(Default.RequestTimeout));
 
             var request = PrepareRequest(httpMethod, relativeUrl, queryParameters, body);
             try
@@ -54,14 +54,14 @@ namespace VISABConnector.Http
                 return new HttpResponseMessage
                 {
                     RequestMessage = request,
-                    ReasonPhrase = $"[VISABConnector] Failed to make request to VISAB api. Most likely VISAB WebApi isn't running.",
-                    StatusCode = System.Net.HttpStatusCode.BadGateway
+                    Content = new StringContent($"[VISABConnector] Failed to make request to VISAB api. Most likely VISAB WebApi isn't running."),
+                    StatusCode = System.Net.HttpStatusCode.BadRequest
                 };
             }
         }
 
         /// <summary>
-        /// Builds a parametrized url from the given query parameters
+        /// Builds a parametrized url from the given query parameters.
         /// </summary>
         /// <param name="relativeUrl">The relative url without the parameters</param>
         /// <param name="queryParameters">The query parameters to add</param>
@@ -72,20 +72,23 @@ namespace VISABConnector.Http
         }
 
         /// <summary>
-        /// Reads the content from a HttpResponseMessage
+        /// Reads the content from a HttpResponseMessage.
         /// </summary>
         /// <param name="httpResponse">The HttpResponseMessage to read the content from</param>
-        /// <returns>The content as a string, empty string if request wasn't successful</returns>
+        /// <returns>The content as a string, empty string if request wasnt successful</returns>
         protected static async Task<string> GetResponseContentAsync(HttpResponseMessage httpResponse)
         {
-            if (httpResponse.IsSuccessStatusCode)
-                return await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-            else
-                return "";
+            if (httpResponse.Content != null)
+            {
+                var content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+                if (content != null)
+                    return content;
+            }
+            return "";
         }
 
         /// <summary>
-        /// Builds a HttpRequestMessage object
+        /// Builds a HttpRequestMessage object.
         /// </summary>
         /// <param name="httpMethod">The http method used</param>
         /// <param name="relativeUrl">The relative url to make the request to</param>
@@ -103,7 +106,7 @@ namespace VISABConnector.Http
             var request = new HttpRequestMessage(httpMethod, url);
 
             if (!string.IsNullOrWhiteSpace(body))
-                request.Content = new StringContent(body, Default.Encoding, Default.ContentMediaType);
+                request.Content = new System.Net.Http.StringContent(body, Default.Encoding, Default.ContentMediaType);
 
             return request;
         }
