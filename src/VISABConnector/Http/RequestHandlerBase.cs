@@ -54,7 +54,7 @@ namespace VISABConnector.Http
                 return new HttpResponseMessage
                 {
                     RequestMessage = request,
-                    Content = new StringContent($"[VISABConnector] Failed to make request to VISAB api. Most likely VISAB WebApi isn't running."),
+                    Content = new StringContent($"Request to VISAB WebApi was timed out after {requestTimeout} seconds. Likely the VISAB WebApi isnt running."),
                     StatusCode = System.Net.HttpStatusCode.BadRequest
                 };
             }
