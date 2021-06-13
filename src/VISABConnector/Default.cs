@@ -15,7 +15,7 @@ namespace VISABConnector
         /// <summary>
         /// The default host name that VISAB is running on.
         /// </summary>
-        public const string HostName = "http://localhost:";
+        public const string HostName = "http://localhost";
 
         /// <summary>
         /// The default port that VISAB is running on.

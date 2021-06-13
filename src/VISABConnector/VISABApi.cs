@@ -46,7 +46,8 @@ namespace VISABConnector
         /// </summary>
         /// <param name="hostName">The hostname of the VISAB WebAPi</param>
         /// <param name="port">The port of the VISAB WebApi</param>
-        public VISABApi(string hostName = Default.HostName, int port = Default.Port)
+        /// <param name="requestTimeout">The time in seconds before a request is timeouted</param>
+        public VISABApi(string hostName = Default.HostName, int port = Default.Port, int requestTimeout = Default.RequestTimeout)
         {
             if (string.IsNullOrWhiteSpace(hostName))
                 throw new ArgumentException($"An empty hostname if not allowed! A valid hostname is {Default.HostName}");
@@ -54,11 +55,15 @@ namespace VISABConnector
             if (!hostName.StartsWith("http://"))
                 throw new ArgumentException($"Hostnames have to contain the full hostname - including http://. A valid hostname is {Default.HostName}");
 
+            if (requestTimeout < 1)
+                throw new ArgumentException("Request timeout cant be negative!");
+
             HostName = hostName;
             Port = port;
             BaseAdress = hostName.EndsWith(":") ? HostName + Port : HostName + ":" + Port;
+            RequestTimeout = requestTimeout;
 
-            SessionIndependantRequestHandler = new VISABRequestHandler(BaseAdress, null, Default.RequestTimeout);
+            SessionIndependantRequestHandler = new VISABRequestHandler(BaseAdress, null, requestTimeout);
         }
 
         /// <summary>
@@ -158,14 +163,8 @@ namespace VISABConnector
         /// Creates a IVISABSession object and opens a transmission session at the VISAB WebApi.
         /// </summary>
         /// <param name="game">The game of which to sent data</param>
-        /// <param name="requestTimeout">
-        /// The timeout for requests in seconds that should be used for the created session.
-        /// </param>
-        public async Task<ApiResponse<IVISABSession>> InitiateSession(string game, int requestTimeout = Default.RequestTimeout)
+        public async Task<ApiResponse<IVISABSession>> InitiateSession(string game)
         {
-            if (requestTimeout < 1)
-                throw new ArgumentException("Request timeout cant be negative!");
-
             var pingResponse = await IsApiReachable().ConfigureAwait(false);
             if (!pingResponse.IsSuccess)
             {
@@ -190,6 +189,7 @@ namespace VISABConnector
                 };
             }
 
+            // Request handler with game in headers
             var requestHandler = new VISABRequestHandler(BaseAdress, game, RequestTimeout);
 
             // Try to open session
@@ -198,9 +198,6 @@ namespace VISABConnector
             {
                 // The sessionId that was returned by VISAB WebApi
                 var sessionId = openSessionResponse.Content;
-
-                // Create new request handler for the session.
-                requestHandler = new VISABRequestHandler(BaseAdress, game, requestTimeout);
                 requestHandler.AddDefaultHeader("sessionid", sessionId);
 
                 var session = new VISABSession(game, openSessionResponse.Content, requestHandler);
