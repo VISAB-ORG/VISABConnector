@@ -40,12 +40,19 @@ namespace VISABConnector
         Task<ApiResponse<string>> CloseSession();
 
         /// <summary>
+        /// Queries the file that was created by VISAB for the session. Only works if the session
+        /// was closed before.
+        /// </summary>
+        /// <returns>An ApiResponse object with the file as a json string in the content</returns>
+        Task<ApiResponse<string>> GetCreatedFile();
+
+        /// <summary>
         /// Sends a image object to the VISAB WebApi.
         /// </summary>
         /// <typeparam name="T">The type inheriting IImage</typeparam>
-        /// <param name="map">The image object of type T</param>
+        /// <param name="image">The image object of type T</param>
         /// <returns>An ApiResponse object</returns>
-        Task<ApiResponse<string>> SendMap<T>(T map) where T : IImage;
+        Task<ApiResponse<string>> SendImage<T>(T image) where T : IImage;
 
         /// <summary>
         /// Sends a statistics object to the VISAB WebApi.

@@ -17,15 +17,23 @@ namespace VISABConnector.Http
         protected readonly HttpClient httpClient;
 
         /// <summary>
+        /// The timeout for requests in seconds.
+        /// </summary>
+        protected int requestTimeout;
+
+        /// <summary>
         /// Initializes a RequestHandlerBase instance.
         /// </summary>
         /// <param name="baseAdress">The base adress for the HttpClient</param>
-        public RequestHandlerBase(string baseAdress)
+        /// <param name="requestTimeout">The timeout for requests in seconds</param>
+        public RequestHandlerBase(string baseAdress, int requestTimeout)
         {
             // Fix wrong baseAdress: https://stackoverflow.com/questions/23438416/why-is-httpclient-baseaddress-not-working
             var _baseAdress = baseAdress.EndsWith("/") ? baseAdress : baseAdress + '/';
 
             httpClient = new HttpClient { BaseAddress = new System.Uri(_baseAdress) };
+
+            this.requestTimeout = requestTimeout;
 
             // Set the default content header media type
             // httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Default.MediaType));
@@ -42,7 +50,7 @@ namespace VISABConnector.Http
         public async Task<HttpResponseMessage> GetHttpResponseAsync(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters = null, string body = null)
         {
             var cts = new CancellationTokenSource();
-            cts.CancelAfter(TimeSpan.FromSeconds(Default.RequestTimeout));
+            cts.CancelAfter(TimeSpan.FromSeconds(requestTimeout));
 
             var request = PrepareRequest(httpMethod, relativeUrl, queryParameters, body);
             try
@@ -75,7 +83,7 @@ namespace VISABConnector.Http
         /// Reads the content from a HttpResponseMessage.
         /// </summary>
         /// <param name="httpResponse">The HttpResponseMessage to read the content from</param>
-        /// <returns>The content as a string, empty string if request wasnt successful</returns>
+        /// <returns>The content as a string, empty string if content was null</returns>
         protected static async Task<string> GetResponseContentAsync(HttpResponseMessage httpResponse)
         {
             if (httpResponse.Content != null)
