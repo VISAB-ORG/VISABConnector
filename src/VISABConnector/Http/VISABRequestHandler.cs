@@ -15,7 +15,8 @@ namespace VISABConnector.Http
         /// </summary>
         /// <param name="baseAdress">The base adress of the VISAB WebApi</param>
         /// <param name="gameHeader">The game for which information will be sent</param>
-        public VISABRequestHandler(string baseAdress, string gameHeader) : base(baseAdress)
+        /// <param name="requestTimeout">The time in seconds until requests are timeouted</param>
+        public VISABRequestHandler(string baseAdress, string gameHeader, int requestTimeout) : base(baseAdress, requestTimeout)
         {
             httpClient.DefaultRequestHeaders.Add("game", gameHeader);
 
@@ -47,7 +48,8 @@ namespace VISABConnector.Http
             {
                 return new ApiResponse<TResponse>
                 {
-                    IsSuccess = false
+                    IsSuccess = false,
+                    ErrorMessage = response.ErrorMessage
                 };
             }
         }
@@ -62,12 +64,24 @@ namespace VISABConnector.Http
         public async Task<ApiResponse<string>> GetResponseAsync(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, string body)
         {
             var response = await GetHttpResponseAsync(httpMethod, relativeUrl, queryParameters, body).ConfigureAwait(false);
+            var content = await GetResponseContentAsync(response).ConfigureAwait(false);
 
-            return new ApiResponse<string>
+            if (response.IsSuccessStatusCode)
             {
-                IsSuccess = response.IsSuccessStatusCode,
-                Content = await GetResponseContentAsync(response).ConfigureAwait(false)
-            };
+                return new ApiResponse<string>
+                {
+                    IsSuccess = true,
+                    Content = content
+                };
+            }
+            else
+            {
+                return new ApiResponse<string>
+                {
+                    IsSuccess = false,
+                    ErrorMessage = content
+                };
+            }
         }
 
         public async Task<ApiResponse<string>> GetResponseAsync<TBody>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, TBody body)

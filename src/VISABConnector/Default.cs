@@ -23,9 +23,9 @@ namespace VISABConnector
         public const int Port = 2673;
 
         /// <summary>
-        /// Timeout for HTTP Requests in seconds.
+        /// Default timeout for HTTP Requests in seconds.
         /// </summary>
-        public const int RequestTimeout = 1;
+        public const int RequestTimeout = 5;
 
         /// <summary>
         /// Default Encoding of content sent and received by VISAB.
