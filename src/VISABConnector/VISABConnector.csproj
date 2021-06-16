@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiResponse.cs" />
+    <Compile Include="BasicMetaInformation.cs" />
     <Compile Include="Transmission\IImage.cs" />
     <Compile Include="IVISABSession.cs" />
     <Compile Include="Serializer\DontSerialize.cs" />
