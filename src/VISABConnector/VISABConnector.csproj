@@ -52,7 +52,7 @@
     <Compile Include="Http\RequestHandlerBase.cs" />
     <Compile Include="Http\VISABRequestHandler.cs" />
     <Compile Include="Serializer\IgnorePropertyContractResolver.cs" />
-    <Compile Include="Transmission\ISessionMetaInformation.cs" />
+    <Compile Include="Transmission\IMetaInformation.cs" />
     <Compile Include="Transmission\IVISABStatistics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VISABApi.cs" />

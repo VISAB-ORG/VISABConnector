@@ -164,8 +164,11 @@ namespace VISABConnector
         /// </summary>
         /// <param name="metaInformation">The meta information for the session to open</param>
         /// <returns></returns>
-        public async Task<ApiResponse<IVISABSession>> InitiateSession(ISessionMetaInformation metaInformation)
+        public async Task<ApiResponse<IVISABSession>> InitiateSession(IMetaInformation metaInformation)
         {
+            if (metaInformation == null)
+                throw new ArgumentException("Meta information is required for opening a session and therefore cant be null!");
+
             var pingResponse = await IsApiReachable().ConfigureAwait(false);
             if (!pingResponse.IsSuccess)
             {
@@ -192,7 +195,7 @@ namespace VISABConnector
 
             // Try to open session
             var openSessionResponse = await SessionIndependantRequestHandler.
-                GetDeserializedResponseAsync<ISessionMetaInformation, Guid>(HttpMethod.Get, EndpointOpenSession, null, metaInformation).ConfigureAwait(false);
+                GetDeserializedResponseAsync<IMetaInformation, Guid>(HttpMethod.Get, EndpointOpenSession, null, metaInformation).ConfigureAwait(false);
             if (openSessionResponse.IsSuccess)
             {
                 // The sessionId that was returned by VISAB WebApi
