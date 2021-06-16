@@ -49,17 +49,15 @@ namespace VISABConnector
         /// <summary>
         /// Sends a image object to the VISAB WebApi.
         /// </summary>
-        /// <typeparam name="T">The type inheriting IImage</typeparam>
         /// <param name="image">The image object of type T</param>
         /// <returns>An ApiResponse object</returns>
-        Task<ApiResponse<string>> SendImage<T>(T image) where T : IImage;
+        Task<ApiResponse<string>> SendImage(IImage image);
 
         /// <summary>
         /// Sends a statistics object to the VISAB WebApi.
         /// </summary>
-        /// <typeparam name="T">The type inheriting IVISABStatistics</typeparam>
         /// <param name="statistics">The statistics object of type T</param>
         /// <returns>An ApiResponse object</returns>
-        Task<ApiResponse<string>> SendStatistics<T>(T statistics) where T : IVISABStatistics;
+        Task<ApiResponse<string>> SendStatistics(IVISABStatistics statistics);
     }
 }

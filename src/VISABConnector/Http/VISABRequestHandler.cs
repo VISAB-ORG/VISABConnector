@@ -14,12 +14,9 @@ namespace VISABConnector.Http
         /// Initializes a VISABRequestHandler object.
         /// </summary>
         /// <param name="baseAdress">The base adress of the VISAB WebApi</param>
-        /// <param name="gameHeader">The game for which information will be sent</param>
         /// <param name="requestTimeout">The time in seconds until requests are timeouted</param>
-        public VISABRequestHandler(string baseAdress, string gameHeader, int requestTimeout) : base(baseAdress, requestTimeout)
+        public VISABRequestHandler(string baseAdress, int requestTimeout) : base(baseAdress, requestTimeout)
         {
-            httpClient.DefaultRequestHeaders.Add("game", gameHeader);
-
             serializerSettings = new JsonSerializerSettings
             {
                 ContractResolver = new IgnorePropertyContractResolver<DontSerialize>(),
