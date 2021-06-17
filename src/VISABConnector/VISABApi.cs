@@ -44,23 +44,23 @@ namespace VISABConnector
 
         /// <summary>
         /// </summary>
-        /// <param name="hostName">The hostname of the VISAB WebAPi</param>
+        /// <param name="hostAdress">The hostadress of the VISAB WebAPi</param>
         /// <param name="port">The port of the VISAB WebApi</param>
         /// <param name="requestTimeout">The time in seconds before a request is timeouted</param>
-        public VISABApi(string hostName = Default.HostName, int port = Default.Port, int requestTimeout = Default.RequestTimeout)
+        public VISABApi(string hostAdress = Default.HostAdress, int port = Default.Port, int requestTimeout = Default.RequestTimeout)
         {
-            if (string.IsNullOrWhiteSpace(hostName))
-                throw new ArgumentException($"An empty hostname if not allowed! A valid hostname is {Default.HostName}");
+            if (string.IsNullOrWhiteSpace(hostAdress))
+                throw new ArgumentException($"An empty hostadress if not allowed! A valid hostadress is {Default.HostAdress}");
 
-            if (!hostName.StartsWith("http://"))
-                throw new ArgumentException($"Hostnames have to contain the full hostname - including http://. A valid hostname is {Default.HostName}");
+            if (!hostAdress.StartsWith("http://"))
+                throw new ArgumentException($"Hostadress have to contain the full adress - including http://. A valid hostadress is {Default.HostAdress}");
 
             if (requestTimeout < 1)
                 throw new ArgumentException("Request timeout cant be negative!");
 
-            HostName = hostName;
+            HostAdress = hostAdress;
             Port = port;
-            BaseAdress = hostName.EndsWith(":") ? HostName + Port : HostName + ":" + Port;
+            BaseAdress = hostAdress.EndsWith(":") ? HostAdress + Port : HostAdress + ":" + Port;
             RequestTimeout = requestTimeout;
 
             SessionIndependantRequestHandler = new VISABRequestHandler(BaseAdress, requestTimeout);
@@ -77,9 +77,9 @@ namespace VISABConnector
         public string BaseAdress { get; }
 
         /// <summary>
-        /// The host name on which the VISAB WebApi is running.
+        /// The host adress on which the VISAB WebApi is running.
         /// </summary>
-        public string HostName { get; }
+        public string HostAdress { get; }
 
         /// <summary>
         /// The port on which the VISAB WebApi is running.

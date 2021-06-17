@@ -11,13 +11,13 @@
         public T Content { get; internal set; }
 
         /// <summary>
-        /// Whether the request was successful.
-        /// </summary>
-        public bool IsSuccess { get; internal set; }
-
-        /// <summary>
         /// The error message that was returned by VISAB WebApi if request wasnt successful.
         /// </summary>
         public string ErrorMessage { get; internal set; }
+
+        /// <summary>
+        /// Whether the request was successful.
+        /// </summary>
+        public bool IsSuccess { get; internal set; }
     }
 }

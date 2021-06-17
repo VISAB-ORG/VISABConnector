@@ -13,9 +13,9 @@ namespace VISABConnector
         public const string ContentMediaType = "application/json";
 
         /// <summary>
-        /// The default host name that VISAB is running on.
+        /// The default host adress that VISAB is running on.
         /// </summary>
-        public const string HostName = "http://localhost";
+        public const string HostAdress = "http://localhost";
 
         /// <summary>
         /// The default port that VISAB is running on.

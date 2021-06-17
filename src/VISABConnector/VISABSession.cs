@@ -82,6 +82,5 @@ namespace VISABConnector
         {
             return await RequestHandler.GetResponseAsync(HttpMethod.Post, EndpointSendStatistics, null, statistics).ConfigureAwait(false);
         }
-
     }
 }

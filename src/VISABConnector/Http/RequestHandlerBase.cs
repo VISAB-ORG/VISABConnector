@@ -62,7 +62,7 @@ namespace VISABConnector.Http
                 return new HttpResponseMessage
                 {
                     RequestMessage = request,
-                    Content = new StringContent($"Request to VISAB WebApi was timed out after {requestTimeout} seconds. Likely the VISAB WebApi isnt running."),
+                    Content = new StringContent($"Request to VISAB WebApi at {httpClient.BaseAddress} was timed out after {requestTimeout} seconds. Likely the VISAB WebApi isnt running or the adress is incorrect."),
                     StatusCode = System.Net.HttpStatusCode.BadRequest
                 };
             }
