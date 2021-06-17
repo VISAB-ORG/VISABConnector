@@ -73,12 +73,12 @@ namespace VISABConnector
             return await RequestHandler.GetResponseAsync(HttpMethod.Get, EndpointGetFile, @params, null).ConfigureAwait(false);
         }
 
-        public async Task<ApiResponse<string>> SendImage<T>(T image) where T : IImage
+        public async Task<ApiResponse<string>> SendImage(IImage image)
         {
             return await RequestHandler.GetResponseAsync(HttpMethod.Get, EndpointSendImage, null, image).ConfigureAwait(false);
         }
 
-        public async Task<ApiResponse<string>> SendStatistics<T>(T statistics) where T : IVISABStatistics
+        public async Task<ApiResponse<string>> SendStatistics(IVISABStatistics statistics)
         {
             return await RequestHandler.GetResponseAsync(HttpMethod.Post, EndpointSendStatistics, null, statistics).ConfigureAwait(false);
         }

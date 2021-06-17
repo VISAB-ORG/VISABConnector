@@ -26,6 +26,11 @@ namespace VISABConnector
         private const string EndpointListSessions = "session/list";
 
         /// <summary>
+        /// Relative endpoint for opening session to VISAB API
+        /// </summary>
+        private const string EndpointOpenSession = "session/open";
+
+        /// <summary>
         /// Relative endpoint for ping testing the VISAB API
         /// </summary>
         private const string EndpointPing = "ping";
@@ -34,11 +39,6 @@ namespace VISABConnector
         /// Relative endpoints for checking session status in VISAB API
         /// </summary>
         private const string EndpointSessionStatus = "session/status";
-
-        /// <summary>
-        /// Relative endpoint for opening session to VISAB API
-        /// </summary>
-        private const string EndpointOpenSession = "session/open";
 
         #endregion VISAB WebApi endpoints
 
@@ -63,7 +63,7 @@ namespace VISABConnector
             BaseAdress = hostName.EndsWith(":") ? HostName + Port : HostName + ":" + Port;
             RequestTimeout = requestTimeout;
 
-            SessionIndependantRequestHandler = new VISABRequestHandler(BaseAdress, null, requestTimeout);
+            SessionIndependantRequestHandler = new VISABRequestHandler(BaseAdress, requestTimeout);
         }
 
         /// <summary>
@@ -162,9 +162,13 @@ namespace VISABConnector
         /// <summary>
         /// Creates a IVISABSession object and opens a transmission session at the VISAB WebApi.
         /// </summary>
-        /// <param name="game">The game of which to sent data</param>
-        public async Task<ApiResponse<IVISABSession>> InitiateSession(string game)
+        /// <param name="metaInformation">The meta information for the session to open</param>
+        /// <returns>An APIResponse object containing a IVISABSession if session was created</returns>
+        public async Task<ApiResponse<IVISABSession>> InitiateSession(IMetaInformation metaInformation)
         {
+            if (metaInformation == null)
+                throw new ArgumentException("Meta information is required for opening a session and therefore cant be null!");
+
             var pingResponse = await IsApiReachable().ConfigureAwait(false);
             if (!pingResponse.IsSuccess)
             {
@@ -175,10 +179,10 @@ namespace VISABConnector
                 };
             }
 
-            var gameSupportedResponse = await GameIsSupported(game).ConfigureAwait(false);
+            var gameSupportedResponse = await GameIsSupported(metaInformation.Game).ConfigureAwait(false);
             if (gameSupportedResponse.IsSuccess && !gameSupportedResponse.Content)
             {
-                throw new ArgumentException($"Game {game} is not supported by the VISAB WebApi!");
+                throw new ArgumentException($"Game {metaInformation.Game} is not supported by the VISAB WebApi!");
             }
             else if (!gameSupportedResponse.IsSuccess)
             {
@@ -189,18 +193,20 @@ namespace VISABConnector
                 };
             }
 
-            // Request handler with game in headers
-            var requestHandler = new VISABRequestHandler(BaseAdress, game, RequestTimeout);
-
             // Try to open session
-            var openSessionResponse = await requestHandler.GetDeserializedResponseAsync<Guid>(HttpMethod.Get, EndpointOpenSession, null, null).ConfigureAwait(false);
+            var openSessionResponse = await SessionIndependantRequestHandler.
+                GetDeserializedResponseAsync<IMetaInformation, Guid>(HttpMethod.Get, EndpointOpenSession, null, metaInformation).ConfigureAwait(false);
             if (openSessionResponse.IsSuccess)
             {
                 // The sessionId that was returned by VISAB WebApi
                 var sessionId = openSessionResponse.Content;
+
+                // Create new request handler with the game and sessionId in default header
+                var requestHandler = new VISABRequestHandler(BaseAdress, RequestTimeout);
+                requestHandler.AddDefaultHeader("game", metaInformation.Game);
                 requestHandler.AddDefaultHeader("sessionid", sessionId);
 
-                var session = new VISABSession(game, openSessionResponse.Content, requestHandler);
+                var session = new VISABSession(metaInformation.Game, openSessionResponse.Content, requestHandler);
 
                 return new ApiResponse<IVISABSession>
                 {
@@ -216,6 +222,18 @@ namespace VISABConnector
                     ErrorMessage = openSessionResponse.ErrorMessage
                 };
             }
+        }
+
+        /// <summary>
+        /// Creates a IVISABSession object and opens a transmission session at the VISAB WebApi.
+        /// </summary>
+        /// <param name="game">The game for which to create the session</param>
+        /// <returns>An APIResponse object containing a IVISABSession if session was created.</returns>
+        public async Task<ApiResponse<IVISABSession>> InitiateSession(string game)
+        {
+            var metaInformation = new BasicMetaInformation { Game = game };
+
+            return await InitiateSession(metaInformation).ConfigureAwait(false);
         }
 
         /// <summary>
