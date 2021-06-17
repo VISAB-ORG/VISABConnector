@@ -195,7 +195,7 @@ namespace VISABConnector
 
             // Try to open session
             var openSessionResponse = await SessionIndependantRequestHandler.
-                GetDeserializedResponseAsync<IMetaInformation, Guid>(HttpMethod.Get, EndpointOpenSession, null, metaInformation).ConfigureAwait(false);
+                GetDeserializedResponseAsync<IMetaInformation, Guid>(HttpMethod.Post, EndpointOpenSession, null, metaInformation).ConfigureAwait(false);
             if (openSessionResponse.IsSuccess)
             {
                 // The sessionId that was returned by VISAB WebApi
