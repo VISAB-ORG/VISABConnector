@@ -32,6 +32,8 @@ namespace VISABConnector
 
         #endregion VISAB WebApi endpoints
 
+        private const string SessionAlreadyClosedResponse = "SESSIONALREADYCLOSED";
+
         /// <summary>
         /// </summary>
         /// <param name="game">The game of the session</param>
@@ -76,12 +78,20 @@ namespace VISABConnector
 
         public async Task<ApiResponse<string>> SendImage(IImage image)
         {
-            return await RequestHandler.GetResponseAsync(HttpMethod.Get, EndpointSendImage, null, image).ConfigureAwait(false);
+            var response = await RequestHandler.GetResponseAsync(HttpMethod.Get, EndpointSendImage, null, image).ConfigureAwait(false);
+            if (!response.IsSuccess && response.ErrorMessage.Contains(SessionAlreadyClosedResponse))
+                IsActive = false;
+
+            return response;
         }
 
         public async Task<ApiResponse<string>> SendStatistics(IVISABStatistics statistics)
         {
-            return await RequestHandler.GetResponseAsync(HttpMethod.Post, EndpointSendStatistics, null, statistics).ConfigureAwait(false);
+            var response = await RequestHandler.GetResponseAsync(HttpMethod.Post, EndpointSendStatistics, null, statistics).ConfigureAwait(false);
+            if (!response.IsSuccess && response.ErrorMessage.Contains(SessionAlreadyClosedResponse))
+                IsActive = false;
+
+            return response;
         }
     }
 }
