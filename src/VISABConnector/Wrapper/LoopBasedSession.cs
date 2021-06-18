@@ -5,11 +5,25 @@ using System.Threading.Tasks;
 namespace VISABConnector
 {
     /// <summary>
+    /// The file consumer delegate type.
+    /// </summary>
+    /// <param name="json"></param>
+    public delegate void FileConsumer(string json);
+
+    /// <summary>
     /// A wrapper class for communicating with the VISAB WebApi in games that sent data continously.
     /// </summary>
     public static class LoopBasedSession
     {
-        private static IVISABSession session;
+        /// <summary>
+        /// The underylying session that is used.
+        /// </summary>
+        public static IVISABSession Session { get; private set; }
+
+        /// <summary>
+        /// Event that will be invoked when a saved file is received.
+        /// </summary>
+        public static event FileConsumer FileReceivedEvent;
 
         /// <summary>
         /// Event that will be invoked when a log message should be written.
@@ -28,16 +42,16 @@ namespace VISABConnector
         /// <returns>True if session was closed</returns>
         public static async Task<bool> CloseSessionAsync()
         {
-            if (session == null || !session.IsActive)
+            if (Session == null || !Session.IsActive)
             {
                 WriteLog("Session is null or inactive. Wont have to close it.");
                 return true;
             }
 
             // Close the VISAB api session
-            WriteLog($"Closing session with VISAB WebApi.\nSessionId: {session.SessionId}");
+            WriteLog($"Closing session with VISAB WebApi.\nSessionId: {Session.SessionId}");
 
-            var response = await session.CloseSession().ConfigureAwait(false);
+            var response = await Session.CloseSession().ConfigureAwait(false);
             if (response.IsSuccess)
                 WriteLog("Closed session at VISAB WebApi.");
             else
@@ -52,18 +66,23 @@ namespace VISABConnector
         /// <returns>The written json file if successfully retrieved, empty string else</returns>
         public static async Task<string> GetFileAsync()
         {
-            if (session == null)
+            if (Session == null)
             {
                 WriteLog("Session is null. Cant get file.");
                 return "";
             }
 
             WriteLog("Making request to receive file from VISAB WebApi.");
-            var response = await session.GetCreatedFile().ConfigureAwait(false);
+            var response = await Session.GetCreatedFile().ConfigureAwait(false);
             if (response.IsSuccess)
+            {
                 WriteLog($"Received file from VISAB WebApi.\n{response.Content}");
+                FileReceivedEvent?.Invoke(response.Content);
+            }
             else
+            {
                 WriteLog($"Failed to receive file from VISAB WebApi.\nErrorMessage: {response.ErrorMessage}");
+            }
 
             return response.Content;
         }
@@ -75,13 +94,13 @@ namespace VISABConnector
         /// <returns>True if successfully sent</returns>
         public static async Task<bool> SendImagesAsync(IImage image)
         {
-            if (session == null || !session.IsActive)
+            if (Session == null || !Session.IsActive)
             {
                 WriteLog("Session was null or inactive. Wont send images.");
                 return false;
             }
 
-            var response = await session.SendImage(image).ConfigureAwait(false);
+            var response = await Session.SendImage(image).ConfigureAwait(false);
             if (response.IsSuccess)
                 WriteLog($"Send images to VISAB!");
             else
@@ -108,8 +127,8 @@ namespace VISABConnector
             var response = await visabApi.InitiateSession(metaInformation).ConfigureAwait(false);
             if (response.IsSuccess)
             {
-                session = response.Content;
-                WriteLog($"Initialized Session with VISAB WebApi.\nSessionId: {session.SessionId}");
+                Session = response.Content;
+                WriteLog($"Initialized Session with VISAB WebApi.\nSessionId: {Session.SessionId}");
                 return true;
             }
             else
@@ -156,7 +175,7 @@ namespace VISABConnector
         {
             try
             {
-                if (session == null || !session.IsActive)
+                if (Session == null || !Session.IsActive)
                 {
                     WriteLog("Session was null or inactive. Wont start statistics loop.");
                     return;
@@ -195,8 +214,6 @@ namespace VISABConnector
             }
         }
 
-
-
         /// <summary>
         /// Sends statistics using the current session.
         /// </summary>
@@ -204,13 +221,13 @@ namespace VISABConnector
         /// <returns>True if successfully sent</returns>
         private static async Task<bool> SendStatisticsAsync(IVISABStatistics statistics)
         {
-            if (session == null || !session.IsActive)
+            if (Session == null || !Session.IsActive)
             {
                 WriteLog("Session was null or inactive. Wont send statistics.");
                 return false;
             }
 
-            var response = await session.SendStatistics(statistics).ConfigureAwait(false);
+            var response = await Session.SendStatistics(statistics).ConfigureAwait(false);
             if (response.IsSuccess)
                 WriteLog($"Send statistics to VISAB!");
             else
