@@ -32,7 +32,7 @@ namespace VISABConnector
 
         #endregion VISAB WebApi endpoints
 
-        private const string SessionAlreadyClosedResponse = "SESSIONALREADYCLOSED";
+        private const string SessionAlreadyClosedResponse = "SESSION_ALREADY_CLOSED";
 
         /// <summary>
         /// </summary>
