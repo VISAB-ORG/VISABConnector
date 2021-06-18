@@ -32,6 +32,8 @@ namespace VISABConnector
 
         #endregion VISAB WebApi endpoints
 
+        private const string SessionAlreadyClosedResponse = "SESSION_ALREADY_CLOSED";
+
         /// <summary>
         /// </summary>
         /// <param name="game">The game of the session</param>
@@ -42,6 +44,7 @@ namespace VISABConnector
             Game = game;
             SessionId = sessionId;
             RequestHandler = requestHandler;
+            IsActive = true;
         }
 
         public event EventHandler<ClosingEventArgs> CloseSessionEvent;
@@ -52,7 +55,7 @@ namespace VISABConnector
 
         public IVISABRequestHandler RequestHandler { get; }
 
-        public Guid SessionId { get; private set; }
+        public Guid SessionId { get; }
 
         public async Task<ApiResponse<string>> CloseSession()
         {
@@ -75,12 +78,20 @@ namespace VISABConnector
 
         public async Task<ApiResponse<string>> SendImage(IImage image)
         {
-            return await RequestHandler.GetResponseAsync(HttpMethod.Get, EndpointSendImage, null, image).ConfigureAwait(false);
+            var response = await RequestHandler.GetResponseAsync(HttpMethod.Get, EndpointSendImage, null, image).ConfigureAwait(false);
+            if (!response.IsSuccess && response.ErrorMessage.Contains(SessionAlreadyClosedResponse))
+                IsActive = false;
+
+            return response;
         }
 
         public async Task<ApiResponse<string>> SendStatistics(IVISABStatistics statistics)
         {
-            return await RequestHandler.GetResponseAsync(HttpMethod.Post, EndpointSendStatistics, null, statistics).ConfigureAwait(false);
+            var response = await RequestHandler.GetResponseAsync(HttpMethod.Post, EndpointSendStatistics, null, statistics).ConfigureAwait(false);
+            if (!response.IsSuccess && response.ErrorMessage.Contains(SessionAlreadyClosedResponse))
+                IsActive = false;
+
+            return response;
         }
     }
 }
