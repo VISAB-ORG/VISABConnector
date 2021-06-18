@@ -154,35 +154,42 @@ namespace VISABConnector
         /// <param name="queryFile">Whether to query the created file after the session was closed</param>
         public static async void StartStatisticsLoopAsync(Func<IVISABStatistics> statisticsFunc, Func<bool> shouldSend, int sentDelay, CancellationToken cancellationToken, bool breakOnFailed = true, bool queryFile = false)
         {
-            if (session == null || !session.IsActive)
+            try
             {
-                WriteLog("Session was null or inactive. Wont start statistics loop.");
-                return;
-            }
-
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                var statistics = statisticsFunc();
-                if (shouldSend() && statistics != null)
+                if (session == null || !session.IsActive)
                 {
-                    // Cant ConfigureAwait(false) since the statistics func might have to be invoked
-                    // on the calling thread. This is the case when getting data from unity for example.
-                    var statisticsSent = await SendStatisticsAsync(statistics);
-                    if (!statisticsSent && breakOnFailed)
-                    {
-                        WriteLog("Breaking out of loop since statistics failed to be sent.");
-                        break;
-                    }
+                    WriteLog("Session was null or inactive. Wont start statistics loop.");
+                    return;
                 }
-                await Task.Delay(sentDelay);
+
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    var statistics = statisticsFunc();
+                    if (shouldSend() && statistics != null)
+                    {
+                        // Cant ConfigureAwait(false) since the statistics func might have to be invoked
+                        // on the calling thread. This is the case when getting data from unity for example.
+                        var statisticsSent = await SendStatisticsAsync(statistics);
+                        if (!statisticsSent && breakOnFailed)
+                        {
+                            WriteLog("Breaking out of loop since statistics failed to be sent.");
+                            break;
+                        }
+                    }
+                    await Task.Delay(sentDelay);
+                }
+
+                // Close the session
+                await CloseSessionAsync().ConfigureAwait(false);
+
+                // Query the file
+                if (queryFile)
+                    SavedFile = await GetFileAsync().ConfigureAwait(false);
             }
-
-            // Close the session
-            await CloseSessionAsync().ConfigureAwait(false);
-
-            // Query the file
-            if (queryFile)
-                SavedFile = await GetFileAsync().ConfigureAwait(false);
+            catch (Exception e)
+            {
+                WriteLog($"Statistics loop after Exception: {e}");
+            }
         }
 
 
