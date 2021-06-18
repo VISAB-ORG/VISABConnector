@@ -53,7 +53,7 @@ namespace VISABConnector
             WriteLog("Making request to receive file from VISAB WebApi.");
             var response = await session.GetCreatedFile().ConfigureAwait(false);
             if (response.IsSuccess)
-                WriteLog("Received file from VISAB WebApi.");
+                WriteLog($"Received file from VISAB WebApi.\n {response.Content}");
             else
                 WriteLog($"Failed to receive file from VISAB WebApi.\nErrorMessage: {response.ErrorMessage}");
 
@@ -150,7 +150,7 @@ namespace VISABConnector
 
         private static void WriteLog(string message)
         {
-            MessageAddedEvent?.Invoke(message);
+            MessageAddedEvent?.Invoke($"[RoundBasedSession]:{message}");
         }
     }
 }

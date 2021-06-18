@@ -61,7 +61,7 @@ namespace VISABConnector
             WriteLog("Making request to receive file from VISAB WebApi.");
             var response = await session.GetCreatedFile().ConfigureAwait(false);
             if (response.IsSuccess)
-                WriteLog("Received file from VISAB WebApi.");
+                WriteLog($"Received file from VISAB WebApi.\n{response.Content}");
             else
                 WriteLog($"Failed to receive file from VISAB WebApi.\nErrorMessage: {response.ErrorMessage}");
 
@@ -162,6 +162,7 @@ namespace VISABConnector
                     return;
                 }
 
+                var failedToSend = false;
                 while (!cancellationToken.IsCancellationRequested)
                 {
                     var statistics = statisticsFunc();
@@ -173,6 +174,7 @@ namespace VISABConnector
                         if (!statisticsSent && breakOnFailed)
                         {
                             WriteLog("Breaking out of loop since statistics failed to be sent.");
+                            failedToSend = true;
                             break;
                         }
                     }
@@ -180,7 +182,8 @@ namespace VISABConnector
                 }
 
                 // Close the session
-                await CloseSessionAsync().ConfigureAwait(false);
+                if (!failedToSend)
+                    await CloseSessionAsync().ConfigureAwait(false);
 
                 // Query the file
                 if (queryFile)
@@ -188,7 +191,7 @@ namespace VISABConnector
             }
             catch (Exception e)
             {
-                WriteLog($"Statistics loop after Exception: {e}");
+                WriteLog($"Statistics loop exited after Exception: {e}");
             }
         }
 
@@ -218,7 +221,7 @@ namespace VISABConnector
 
         private static void WriteLog(string message)
         {
-            MessageAddedEvent?.Invoke(message);
+            MessageAddedEvent?.Invoke($"[LoopBasedSession]:{message}");
         }
     }
 }
