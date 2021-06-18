@@ -43,7 +43,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiResponse.cs" />
-    <Compile Include="BasicMetaInformation.cs" />
+    <Compile Include="Wrapper\BasicMetaInformation.cs" />
+    <Compile Include="Wrapper\LoopBasedSession.cs" />
+    <Compile Include="Wrapper\MessageConsumer.cs" />
+    <Compile Include="Wrapper\RoundBasedSession.cs" />
     <Compile Include="Transmission\IImage.cs" />
     <Compile Include="IVISABSession.cs" />
     <Compile Include="Serializer\DontSerialize.cs" />

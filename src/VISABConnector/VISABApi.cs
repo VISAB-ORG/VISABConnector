@@ -225,18 +225,6 @@ namespace VISABConnector
         }
 
         /// <summary>
-        /// Creates a IVISABSession object and opens a transmission session at the VISAB WebApi.
-        /// </summary>
-        /// <param name="game">The game for which to create the session</param>
-        /// <returns>An APIResponse object containing a IVISABSession if session was created.</returns>
-        public async Task<ApiResponse<IVISABSession>> InitiateSession(string game)
-        {
-            var metaInformation = new BasicMetaInformation { Game = game };
-
-            return await InitiateSession(metaInformation).ConfigureAwait(false);
-        }
-
-        /// <summary>
         /// Indicates if the VISAB WebApi is running. If the request was successful, it is running.
         /// </summary>
         /// <returns>An ApiResponse object</returns>
