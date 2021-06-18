@@ -42,6 +42,7 @@ namespace VISABConnector
             Game = game;
             SessionId = sessionId;
             RequestHandler = requestHandler;
+            IsActive = true;
         }
 
         public event EventHandler<ClosingEventArgs> CloseSessionEvent;
@@ -52,7 +53,7 @@ namespace VISABConnector
 
         public IVISABRequestHandler RequestHandler { get; }
 
-        public Guid SessionId { get; private set; }
+        public Guid SessionId { get; }
 
         public async Task<ApiResponse<string>> CloseSession()
         {
