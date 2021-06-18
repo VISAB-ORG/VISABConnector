@@ -37,7 +37,7 @@ namespace VISABConnector
             // Close the VISAB api session
             WriteLog($"Closing session with VISAB WebApi.\nSessionId: {session.SessionId}");
 
-            var response = await session.CloseSession();
+            var response = await session.CloseSession().ConfigureAwait(false);
             if (response.IsSuccess)
                 WriteLog("Closed session at VISAB WebApi.");
             else
@@ -59,7 +59,7 @@ namespace VISABConnector
             }
 
             WriteLog("Making request to receive file from VISAB WebApi.");
-            var response = await session.CloseSession();
+            var response = await session.GetCreatedFile().ConfigureAwait(false);
             if (response.IsSuccess)
                 WriteLog("Received file from VISAB WebApi.");
             else
@@ -81,7 +81,7 @@ namespace VISABConnector
                 return false;
             }
 
-            var response = await session.SendImage(image);
+            var response = await session.SendImage(image).ConfigureAwait(false);
             if (response.IsSuccess)
                 WriteLog($"Send images to VISAB!");
             else
@@ -200,7 +200,7 @@ namespace VISABConnector
                 return false;
             }
 
-            var response = await session.SendStatistics(statistics);
+            var response = await session.SendStatistics(statistics).ConfigureAwait(false);
             if (response.IsSuccess)
                 WriteLog($"Send statistics to VISAB!");
             else
