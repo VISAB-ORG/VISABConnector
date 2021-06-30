@@ -5,73 +5,70 @@ using System.Threading.Tasks;
 namespace VISABConnector
 {
     /// <summary>
-    /// Used for making Http requests to the VISAB WebApi
+    /// Used for making Http requests to the VISAB WebApi.
     /// </summary>
     public interface IVISABRequestHandler
     {
         /// <summary>
-        /// Gets the deserialize response content
+        /// Adds an attribute value pair to the default request header.
+        /// </summary>
+        /// <param name="name">The name of the attribute</param>
+        /// <param name="value">The value of the attribute</param>
+        void AddDefaultHeader(string name, object value);
+
+        /// <summary>
+        /// Makes a request to the VISAB WebApi and deserialiazes the responses content.
         /// </summary>
         /// <typeparam name="TResponse">The type to deserialize into</typeparam>
-        /// <param name="httpMethod">The http method used</param>
-        /// <param name="relativeUrl">The relative url to make the request to</param>
-        /// <param name="queryParameters">The query parameters</param>
-        /// <param name="body">The requests body</param>
-        /// <returns>An awaitable Task whose body contains the deserialized object</returns>
-        Task<TResponse> GetDeserializedResponseAsync<TResponse>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters = null, string body = null);
+        /// <param name="httpMethod">The HttpMethod used for the request</param>
+        /// <param name="relativeUrl">The relative url for the request</param>
+        /// <param name="queryParameters">The query parameters for the request</param>
+        /// <param name="body">The body of the request</param>
+        /// <returns>
+        /// A ApiResponse object with the deserialized content if sucessful. Otherwise the content
+        /// has the default value of TResponse.
+        /// </returns>
+        Task<ApiResponse<TResponse>> GetDeserializedResponseAsync<TResponse>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters = null, string body = null);
 
         /// <summary>
-        /// Gets the deserialize response content
+        /// Makes a request to the VISAB WebApi and deserialiazes the responses content. The given
+        /// body object is serialized into a json string before sending.
         /// </summary>
+        /// <typeparam name="TBody">The type of the body to serialize</typeparam>
         /// <typeparam name="TResponse">The type to deserialize into</typeparam>
-        /// <typeparam name="TBody">The type of the body</typeparam>
-        /// <param name="httpMethod">The http method used</param>
-        /// <param name="relativeUrl">The relative url to make the request to</param>
-        /// <param name="queryParameters">The query parameters</param>
-        /// <param name="body">The requests body</param>
-        /// <returns>An awaitable Task whose body contains the deserialized object</returns>
-        Task<TResponse> GetDeserializedResponseAsync<TBody, TResponse>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, TBody body);
+        /// <param name="httpMethod">The HttpMethod used for the request</param>
+        /// <param name="relativeUrl">The relative url for the request</param>
+        /// <param name="queryParameters">The query parameters for the request</param>
+        /// <param name="body">The body of the request</param>
+        /// <returns>
+        /// A ApiResponse object with the deserialized content if sucessful. Otherwise the content
+        /// has the default value of TResponse.
+        /// </returns>
+        Task<ApiResponse<TResponse>> GetDeserializedResponseAsync<TBody, TResponse>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, TBody body);
 
         /// <summary>
-        /// Gets the json response content
+        /// Makes a request to the VISAB WebApi.
         /// </summary>
-        /// <param name="httpMethod">The http method used</param>
-        /// <param name="relativeUrl">The relative url to make the request to</param>
-        /// <param name="queryParameters">The query parameters</param>
-        /// <param name="body">The requests body</param>
-        /// <returns>An awaitable Task whose body contains the json string</returns>
-        Task<string> GetJsonResponseAsync(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, string body);
+        /// <param name="httpMethod">The HttpMethod used for the request</param>
+        /// <param name="relativeUrl">The relative url for the request</param>
+        /// <param name="queryParameters">The query parameters for the request</param>
+        /// <param name="body">The body of the request</param>
+        /// <returns>
+        /// A ApiResponse object with set content if successful. Content is null if not successful.
+        /// </returns>
+        Task<ApiResponse<string>> GetResponseAsync(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, string body);
 
         /// <summary>
-        /// Gets the json response content
+        /// Makes a request to the VISAB WebApi. The given body object is serialized into a json
+        /// string before sending.
         /// </summary>
-        /// <typeparam name="TBody">The type of the body</typeparam>
-        /// <param name="httpMethod">The http method used</param>
-        /// <param name="relativeUrl">The relative url to make the request to</param>
-        /// <param name="queryParameters">The query parameters</param>
-        /// <param name="body">The requests body</param>
-        /// <returns>An awaitable Task whose body contains the json string</returns>
-        Task<string> GetJsonResponseAsync<TBody>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, TBody body);
-
-        /// <summary>
-        /// Gets whether the requests response status was successful
-        /// </summary>
-        /// <param name="httpMethod">The http method used</param>
-        /// <param name="relativeUrl">The relative url to make the request to</param>
-        /// <param name="queryParameters">The query parameters</param>
-        /// <param name="body">The requests body</param>
-        /// <returns>An awaitable Task whose body contains whether the request was successful</returns>
-        Task<bool> GetSuccessResponseAsync(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, string body);
-
-        /// <summary>
-        /// Gets whether the requests response status was successful
-        /// </summary>
-        /// <typeparam name="TBody">The type of the body</typeparam>
-        /// <param name="httpMethod">The http method used</param>
-        /// <param name="relativeUrl">The relative url to make the request to</param>
-        /// <param name="queryParameters">The query parameters</param>
-        /// <param name="body">The requests body</param>
-        /// <returns>An awaitable Task whose body contains whether the request was successful</returns>
-        Task<bool> GetSuccessResponseAsync<TBody>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, TBody body);
+        /// <param name="httpMethod">The HttpMethod used for the request</param>
+        /// <param name="relativeUrl">The relative url for the request</param>
+        /// <param name="queryParameters">The query parameters for the request</param>
+        /// <param name="body">The body of the request</param>
+        /// <returns>
+        /// A ApiResponse object with set content if successful. Content is null if not successful.
+        /// </returns>
+        Task<ApiResponse<string>> GetResponseAsync<TBody>(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters, TBody body);
     }
 }

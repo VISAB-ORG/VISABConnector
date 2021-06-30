@@ -1,88 +1,97 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using VISABConnector.Http;
 
 namespace VISABConnector
 {
     ///<inheritdoc cref="IVISABSession"/>
-    public class VISABSession : IVISABSession
+    internal class VISABSession : IVISABSession
     {
         #region VISAB WebApi endpoints
 
         /// <summary>
-        /// Relative endpoint for sending maps in VISAB API
+        /// Relative endpoint for closing session to VISAB API
         /// </summary>
-        private const string ENDPOINT_MAP = "send/map";
+        private const string EndpointCloseSession = "session/close";
 
         /// <summary>
-        /// Relative endpoint for closing session in VISAB API
+        /// Relative endpoint for getting the created file at VISAB Api.
         /// </summary>
-        private const string ENDPOINT_SESSION_CLOSE = "session/close";
+        private const string EndpointGetFile = "file/get";
 
         /// <summary>
-        /// Relative endpoint for opening session in VISAB API
+        /// Relative endpoint for sending images to VISAB API.
         /// </summary>
-        private const string ENDPOINT_SESSION_OPEN = "session/open";
+        private const string EndpointSendImage = "send/image";
 
         /// <summary>
-        /// Relative endpoint for sending statistics in VISAB API
+        /// Relative endpoint for sending statistics to VISAB API
         /// </summary>
-        private const string ENDPOINT_STATISTICS = "send/statistics";
+        private const string EndpointSendStatistics = "send/statistics";
 
         #endregion VISAB WebApi endpoints
 
-        internal VISABSession(string game, Guid sessionId)
+        private const string SessionAlreadyClosedResponse = "SESSION_ALREADY_CLOSED";
+
+        /// <summary>
+        /// </summary>
+        /// <param name="game">The game of the session</param>
+        /// <param name="sessionId">The id of session</param>
+        /// <param name="requestHandler">The request handler that will be used by the session</param>
+        internal VISABSession(string game, Guid sessionId, IVISABRequestHandler requestHandler)
         {
             Game = game;
             SessionId = sessionId;
-            RequestHandler = new VISABRequestHandler(game, sessionId);
+            RequestHandler = requestHandler;
+            IsActive = true;
         }
 
-        ///<inheritdoc/>
         public event EventHandler<ClosingEventArgs> CloseSessionEvent;
 
-        ///<inheritdoc/>
         public string Game { get; }
 
-        ///<inheritdoc/>
-        public bool IsActive { get; internal set; }
+        public bool IsActive { get; private set; }
 
-        ///<inheritdoc/>
         public IVISABRequestHandler RequestHandler { get; }
 
-        ///<inheritdoc/>
         public Guid SessionId { get; }
 
-        ///<inheritdoc/>
-        public async Task<bool> CloseSession()
+        public async Task<ApiResponse<string>> CloseSession()
         {
-            await Task.Run(() => CloseSessionEvent?.Invoke(this, new ClosingEventArgs { RequestHandler = RequestHandler })).ConfigureAwait(false);
+            CloseSessionEvent?.Invoke(this, new ClosingEventArgs { RequestHandler = RequestHandler });
 
-            var closed = await RequestHandler.GetSuccessResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_CLOSE, null, null).ConfigureAwait(false);
+            var response = await RequestHandler.GetResponseAsync(HttpMethod.Get, EndpointCloseSession, null, null).ConfigureAwait(false);
 
-            if (closed)
+            if (response.IsSuccess)
                 IsActive = false;
 
-            return closed;
+            return response;
         }
 
-        ///<inheritdoc/>
-        public Task<bool> SendMap<T>(T map) where T : IUnityMap
+        public async Task<ApiResponse<string>> GetCreatedFile()
         {
-            throw new NotImplementedException();
+            var @params = new List<string> { $"sessionid={SessionId}" };
+
+            return await RequestHandler.GetResponseAsync(HttpMethod.Get, EndpointGetFile, @params, null).ConfigureAwait(false);
         }
 
-        ///<inheritdoc/>
-        public async Task<bool> SendStatistics<T>(T statistics) where T : IVISABStatistics
+        public async Task<ApiResponse<string>> SendImage(IImage image)
         {
-            return await RequestHandler.GetSuccessResponseAsync(HttpMethod.Post, ENDPOINT_STATISTICS, null, statistics).ConfigureAwait(false);
+            var response = await RequestHandler.GetResponseAsync(HttpMethod.Get, EndpointSendImage, null, image).ConfigureAwait(false);
+            if (!response.IsSuccess && response.ErrorMessage.Contains(SessionAlreadyClosedResponse))
+                IsActive = false;
+
+            return response;
         }
 
-        ///<inheritdoc/>
-        internal async Task<bool> OpenSession()
+        public async Task<ApiResponse<string>> SendStatistics(IVISABStatistics statistics)
         {
-            return await RequestHandler.GetSuccessResponseAsync(HttpMethod.Get, ENDPOINT_SESSION_OPEN, null, null).ConfigureAwait(false);
+            var response = await RequestHandler.GetResponseAsync(HttpMethod.Post, EndpointSendStatistics, null, statistics).ConfigureAwait(false);
+            if (!response.IsSuccess && response.ErrorMessage.Contains(SessionAlreadyClosedResponse))
+                IsActive = false;
+
+            return response;
         }
     }
 }

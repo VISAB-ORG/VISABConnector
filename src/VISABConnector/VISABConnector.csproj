@@ -42,8 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncHelper.cs" />
-    <Compile Include="Transmission\IUnityMap.cs" />
+    <Compile Include="ApiResponse.cs" />
+    <Compile Include="Wrapper\BasicMetaInformation.cs" />
+    <Compile Include="Wrapper\LoopBasedSession.cs" />
+    <Compile Include="Wrapper\MessageConsumer.cs" />
+    <Compile Include="Wrapper\RoundBasedSession.cs" />
+    <Compile Include="Transmission\IImage.cs" />
     <Compile Include="IVISABSession.cs" />
     <Compile Include="Serializer\DontSerialize.cs" />
     <Compile Include="Event\ClosingEventArgs.cs" />
@@ -52,9 +56,10 @@
     <Compile Include="Http\RequestHandlerBase.cs" />
     <Compile Include="Http\VISABRequestHandler.cs" />
     <Compile Include="Serializer\IgnorePropertyContractResolver.cs" />
+    <Compile Include="Transmission\IMetaInformation.cs" />
     <Compile Include="Transmission\IVISABStatistics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VISABConnector.cs" />
+    <Compile Include="VISABApi.cs" />
     <Compile Include="VISABSession.cs" />
   </ItemGroup>
   <ItemGroup>

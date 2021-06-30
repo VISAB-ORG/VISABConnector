@@ -4,55 +4,60 @@ using System.Threading.Tasks;
 namespace VISABConnector
 {
     /// <summary>
-    /// Class that embodies a transmission session at the VISAB WebApi
+    /// Class that provides access the functionality provided by a transmission session at the VISAB WebApi.
     /// </summary>
     public interface IVISABSession
     {
         /// <summary>
-        /// Event that is invoked before closing the session
+        /// Event that is invoked before closing the session.
         /// </summary>
         event EventHandler<ClosingEventArgs> CloseSessionEvent;
 
         /// <summary>
-        /// The name of the game of which data will be sent
+        /// The name of the game of which data will be sent.
         /// </summary>
         string Game { get; }
 
         /// <summary>
-        /// Whether the session is active at the VISAB WebApi
+        /// Whether the session is active at the VISAB WebApi.
         /// </summary>
         bool IsActive { get; }
 
         /// <summary>
-        /// The RequestHandler used for making the Http requests
+        /// The RequestHandler used for making the Http requests.
         /// </summary>
         IVISABRequestHandler RequestHandler { get; }
 
         /// <summary>
-        /// The unique identifier for the current session
+        /// The unique identifier for the current session.
         /// </summary>
         Guid SessionId { get; }
 
         /// <summary>
-        /// Closes the session at the VISAB WebApi
+        /// Closes the session at the VISAB WebApi.
         /// </summary>
-        /// <returns>True if the session was succesfully closed, false else</returns>
-        Task<bool> CloseSession();
+        /// <returns>An ApiResponse object</returns>
+        Task<ApiResponse<string>> CloseSession();
 
         /// <summary>
-        /// Sends a map object to the VISAB WebApi
+        /// Queries the file that was created by VISAB for the session. Only works if the session
+        /// was closed before.
         /// </summary>
-        /// <typeparam name="T">The type inheriting IUnityMap</typeparam>
-        /// <param name="map">The map object of type T</param>
-        /// <returns>True if the map was received by VISAB, false else</returns>
-        Task<bool> SendMap<T>(T map) where T : IUnityMap;
+        /// <returns>An ApiResponse object with the file as a json string in the content</returns>
+        Task<ApiResponse<string>> GetCreatedFile();
 
         /// <summary>
-        /// Sends a statistics object to the VISAB WebApi
+        /// Sends a image object to the VISAB WebApi.
         /// </summary>
-        /// <typeparam name="T">The type inheriting IVISABStatistics</typeparam>
+        /// <param name="image">The image object of type T</param>
+        /// <returns>An ApiResponse object</returns>
+        Task<ApiResponse<string>> SendImage(IImage image);
+
+        /// <summary>
+        /// Sends a statistics object to the VISAB WebApi.
+        /// </summary>
         /// <param name="statistics">The statistics object of type T</param>
-        /// <returns>True if the statistics were received by VISAB, false else</returns>
-        Task<bool> SendStatistics<T>(T statistics) where T : IVISABStatistics;
+        /// <returns>An ApiResponse object</returns>
+        Task<ApiResponse<string>> SendStatistics(IVISABStatistics statistics);
     }
 }
