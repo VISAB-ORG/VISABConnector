@@ -4,15 +4,10 @@ using System.Threading.Tasks;
 namespace VISABConnector
 {
     /// <summary>
-    /// Class that provides access the functionality provided by a transmission session at the VISAB WebApi.
+    /// Interface that represents a transmission session at the VISAB WebApi and provides functionality for it.    
     /// </summary>
     public interface IVISABSession
     {
-        /// <summary>
-        /// Event that is invoked before closing the session.
-        /// </summary>
-        event EventHandler<ClosingEventArgs> CloseSessionEvent;
-
         /// <summary>
         /// The name of the game of which data will be sent.
         /// </summary>

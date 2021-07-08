@@ -3,7 +3,7 @@
 namespace VISABConnector
 {
     /// <summary>
-    /// Contains default values used for communication with the VISAB WebApi.
+    /// Default values used for communication with the VISAB WebApi.
     /// </summary>
     public static class Default
     {
