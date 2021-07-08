@@ -5,12 +5,6 @@ using System.Threading.Tasks;
 namespace VISABConnector
 {
     /// <summary>
-    /// The file consumer delegate type.
-    /// </summary>
-    /// <param name="json"></param>
-    public delegate void FileConsumer(string json);
-
-    /// <summary>
     /// A wrapper class for communicating with the VISAB WebApi in games that sent data continously.
     /// </summary>
     public static class LoopBasedSession
@@ -22,13 +16,15 @@ namespace VISABConnector
 
         /// <summary>
         /// Event that will be invoked when a saved file is received.
+        /// The argument is the json string of the saved file.
         /// </summary>
-        public static event FileConsumer FileReceivedEvent;
+        public static event Action<string> FileReceivedEvent;
 
         /// <summary>
         /// Event that will be invoked when a log message should be written.
+        /// The argument contains the message.
         /// </summary>
-        public static event MessageConsumer MessageAddedEvent;
+        public static event Action<string> MessageAddedEvent;
 
         /// <summary>
         /// The file that was created and saved by the VISAB WebApi.
@@ -129,13 +125,13 @@ namespace VISABConnector
             {
                 Session = response.Content;
                 WriteLog($"Initialized Session with VISAB WebApi.\nSessionId: {Session.SessionId}");
+
                 return true;
             }
-            else
-            {
-                WriteLog($"Failed to initiate session with VISAB WebApi.\nErrorMessage: {response.ErrorMessage}");
-                return false;
-            }
+
+            WriteLog($"Failed to initiate session with VISAB WebApi.\nErrorMessage: {response.ErrorMessage}");
+
+            return false;
         }
 
         /// <summary>

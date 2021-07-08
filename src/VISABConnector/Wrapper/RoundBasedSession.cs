@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace VISABConnector
 {
@@ -14,8 +15,9 @@ namespace VISABConnector
 
         /// <summary>
         /// Event that will be invoked when a log message should be written.
+        /// The argument contains the message.
         /// </summary>
-        public static event MessageConsumer MessageAddedEvent;
+        public static event Action<string> MessageAddedEvent;
 
         /// <summary>
         /// Closes the active session.
@@ -127,13 +129,13 @@ namespace VISABConnector
             {
                 Session = response.Content;
                 WriteLog($"Initialized Session with VISAB WebApi.\nSessionId: {Session.SessionId}");
+
                 return true;
             }
-            else
-            {
-                WriteLog($"Failed to initiate session with VISAB WebApi.\nErrorMessage: {response.ErrorMessage}");
-                return false;
-            }
+
+            WriteLog($"Failed to initiate session with VISAB WebApi.\nErrorMessage: {response.ErrorMessage}");
+
+            return false;
         }
 
         /// <summary>

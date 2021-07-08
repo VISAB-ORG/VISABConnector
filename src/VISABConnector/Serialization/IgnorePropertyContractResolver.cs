@@ -6,7 +6,7 @@ using System.Reflection;
 namespace VISABConnector
 {
     /// <summary>
-    /// Contract resolver that doesn't serialize properties decorated with attributes of type T.
+    /// Contract resolver that doesnt serialize properties decorated with attributes of type T.
     /// </summary>
     /// <typeparam name="T">The attribute type to ignore</typeparam>
     internal class IgnorePropertyContractResolver<T> : DefaultContractResolver where T : Attribute

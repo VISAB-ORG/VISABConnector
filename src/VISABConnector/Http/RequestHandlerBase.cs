@@ -9,34 +9,30 @@ namespace VISABConnector.Http
     /// <summary>
     /// Base class used for making Http requests. Classes making Http requests should inherit from this.
     /// </summary>
-    internal class RequestHandlerBase
+    internal abstract class RequestHandlerBase
     {
         /// <summary>
         /// The used HttpClient.
         /// </summary>
-        protected readonly HttpClient httpClient;
+        protected readonly HttpClient _httpClient;
 
         /// <summary>
         /// The timeout for requests in seconds.
         /// </summary>
-        protected int requestTimeout;
+        protected int _requestTimeout;
 
         /// <summary>
-        /// Initializes a RequestHandlerBase instance.
         /// </summary>
         /// <param name="baseAdress">The base adress for the HttpClient</param>
         /// <param name="requestTimeout">The timeout for requests in seconds</param>
-        public RequestHandlerBase(string baseAdress, int requestTimeout)
+        protected RequestHandlerBase(string baseAdress, int requestTimeout)
         {
             // Fix wrong baseAdress: https://stackoverflow.com/questions/23438416/why-is-httpclient-baseaddress-not-working
             var _baseAdress = baseAdress.EndsWith("/") ? baseAdress : baseAdress + '/';
 
-            httpClient = new HttpClient { BaseAddress = new System.Uri(_baseAdress) };
+            _httpClient = new HttpClient { BaseAddress = new Uri(_baseAdress) };
 
-            this.requestTimeout = requestTimeout;
-
-            // Set the default content header media type
-            // httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Default.MediaType));
+            _requestTimeout = requestTimeout;
         }
 
         /// <summary>
@@ -47,22 +43,22 @@ namespace VISABConnector.Http
         /// <param name="queryParameters">The query parameters</param>
         /// <param name="body">The requests body</param>
         /// <returns>The HttpResponseMessage object</returns>
-        public async Task<HttpResponseMessage> GetHttpResponseAsync(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters = null, string body = null)
+        protected async Task<HttpResponseMessage> GetHttpResponseAsync(HttpMethod httpMethod, string relativeUrl, string body = null, IReadOnlyDictionary<string, string> queryParameters = null)
         {
             var cts = new CancellationTokenSource();
-            cts.CancelAfter(TimeSpan.FromSeconds(requestTimeout));
+            cts.CancelAfter(TimeSpan.FromSeconds(_requestTimeout));
 
-            var request = PrepareRequest(httpMethod, relativeUrl, queryParameters, body);
+            var request = PrepareRequest(httpMethod, relativeUrl, body, queryParameters);
             try
             {
-                return await httpClient.SendAsync(request, cts.Token).ConfigureAwait(false);
+                return await _httpClient.SendAsync(request, cts.Token).ConfigureAwait(false);
             }
             catch (Exception e)
             {
                 return new HttpResponseMessage
                 {
                     RequestMessage = request,
-                    Content = new StringContent($"Request to VISAB WebApi at {httpClient.BaseAddress} was timed out after {requestTimeout} seconds. Likely the VISAB WebApi isnt running or the adress is incorrect. Exception:\n{e}"),
+                    Content = new StringContent($"Request to VISAB WebApi at {_httpClient.BaseAddress} was timed out after {_requestTimeout} seconds. Likely the VISAB WebApi isnt running or the adress is incorrect. Exception:\n{e}"),
                     StatusCode = System.Net.HttpStatusCode.BadRequest
                 };
             }
@@ -74,25 +70,31 @@ namespace VISABConnector.Http
         /// <param name="relativeUrl">The relative url without the parameters</param>
         /// <param name="queryParameters">The query parameters to add</param>
         /// <returns>A parametrized url</returns>
-        protected static string BuildParameterizedUrl(string relativeUrl, IEnumerable<string> queryParameters)
+        protected static string BuildParameterizedUrl(string relativeUrl, IReadOnlyDictionary<string, string> queryParameters)
         {
-            return $"{relativeUrl}?" + string.Join("&", queryParameters);
+            if (queryParameters == null)
+                return relativeUrl;
+
+            var parametrizedUrl = relativeUrl + "?";
+            foreach (var pair in queryParameters)
+                parametrizedUrl += $"{pair.Key}={pair.Value}&";
+
+            return relativeUrl.Substring(0, relativeUrl.Length - 1);
         }
 
         /// <summary>
-        /// Reads the content from a HttpResponseMessage.
+        /// Reads the content of a HttpResponseMessage.
         /// </summary>
         /// <param name="httpResponse">The HttpResponseMessage to read the content from</param>
         /// <returns>The content as a string, empty string if content was null</returns>
         protected static async Task<string> GetResponseContentAsync(HttpResponseMessage httpResponse)
         {
-            if (httpResponse.Content != null)
-            {
-                var content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
-                if (content != null)
-                    return content;
-            }
-            return "";
+            if (httpResponse.Content == null)
+                return "";
+
+            var content = await httpResponse.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            return content ?? "";
         }
 
         /// <summary>
@@ -103,7 +105,7 @@ namespace VISABConnector.Http
         /// <param name="queryParameters">The query parameters</param>
         /// <param name="body">The requests body</param>
         /// <returns>The built HttpRequestMessage object</returns>
-        protected static HttpRequestMessage PrepareRequest(HttpMethod httpMethod, string relativeUrl, IEnumerable<string> queryParameters = null, string body = null)
+        protected static HttpRequestMessage PrepareRequest(HttpMethod httpMethod, string relativeUrl, string body = null, IReadOnlyDictionary<string, string> queryParameters = null)
         {
             // Fix wrong relativeUrl: https://stackoverflow.com/questions/23438416/why-is-httpclient-baseaddress-not-working
             var url = relativeUrl.StartsWith("/") ? relativeUrl.Remove(0, 1) : relativeUrl;
@@ -114,7 +116,7 @@ namespace VISABConnector.Http
             var request = new HttpRequestMessage(httpMethod, url);
 
             if (!string.IsNullOrWhiteSpace(body))
-                request.Content = new System.Net.Http.StringContent(body, Default.Encoding, Default.ContentMediaType);
+                request.Content = new StringContent(body, Default.Encoding, Default.ContentMediaType);
 
             return request;
         }
