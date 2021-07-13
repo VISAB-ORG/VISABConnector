@@ -24,7 +24,7 @@ namespace VISABConnector.Unity
             if (gameObject == null)
                 return null;
 
-            var camera = config.Camera ?? CreateCamera();
+            var camera = config.Camera ?? CameraHelper.CreateCamera();
 
 
 
@@ -60,11 +60,6 @@ namespace VISABConnector.Unity
             // TODO: Dont know if this will be null or throw itself
 
             return @object as GameObject;
-        }
-
-        private static Camera CreateCamera()
-        {
-            return null;
         }
 
         public static Bounds GetBoundsWithChildren(GameObject gameObject)
