@@ -47,7 +47,7 @@
     <Compile Include="Wrapper\BasicMetaInformation.cs" />
     <Compile Include="Wrapper\LoopBasedSession.cs" />
     <Compile Include="Wrapper\RoundBasedSession.cs" />
-    <Compile Include="Interface\IImage.cs" />
+    <Compile Include="Interface\IImageContainer.cs" />
     <Compile Include="Interface\IVISABSession.cs" />
     <Compile Include="Serialization\DontSerialize.cs" />
     <Compile Include="Default.cs" />
