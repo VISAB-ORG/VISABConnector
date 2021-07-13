@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CameraExtensionMethods.cs" />
     <Compile Include="CameraCreator.cs" />
     <Compile Include="UnityExtensionMethods.cs" />
     <Compile Include="ImageCreator.cs" />
