@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraExtensionMethods.cs" />
+    <Compile Include="CameraHelper.cs" />
     <Compile Include="ImageCreator.cs" />
     <Compile Include="InstantiationConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
