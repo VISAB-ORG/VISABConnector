@@ -10,25 +10,27 @@ namespace VISABConnector.Unity
     public static class ImageCreator
     {
         /// <summary>
-        /// TODO: A bunch of dumb arguments checking You may also pass an existing camera.
+        /// TODO: A bunch of dumb arguments checking TODO: You may also pass an existing camera.
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
-        public static byte[] TakeSnapshot(SnapshotConfiguration config, Camera camera = null)
+        public static byte[] TakeSnapshot(SnapshotConfiguration config)
         {
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
-            camera = camera ?? CameraCreator.CreateCamera();
+            int width = config.ImageWidth > 0 ? config.ImageWidth : throw new ArgumentException("Image width was smaller than 0!");
+            int height = config.ImageHeight > 0 ? config.ImageHeight : throw new ArgumentException("Image height was smaller than 0!");
+
+            //camera = camera ?? CameraCreator.CreateCamera();
+            var camera = CameraCreator.CreateCamera();
+            camera.orthographic = config.Orthographic;
 
             var gameObject = config.ShouldInstantiate ? InstantiateGameObject(config.InstantiationSettings) : GameObject.Find(config.GameObjectId);
             if (gameObject == null)
                 throw new NotImplementedException(); // TODO: If this can happend, should throw instead
 
             camera.FocusOn(gameObject, config.CameraOffset, config.CameraRotation);
-
-            int width = config.ImageWidth;
-            int height = config.ImageHeight;
 
             // TODO: Ask marcel what this is
             if (camera.targetTexture == null)
@@ -56,7 +58,10 @@ namespace VISABConnector.Unity
 
             // Remove instantiated gameObject
             if (config.ShouldInstantiate)
+            {
                 GameObject.Destroy(gameObject);
+
+            }
 
             // TODO: Deactivate camera?
 
@@ -64,16 +69,16 @@ namespace VISABConnector.Unity
         }
 
         /// <summary>
-        /// You may also pass an existing camera.
+        /// TODO: You may also pass an existing camera.
         /// </summary>
         /// <param name="configs"></param>
         /// <param name="camera"></param>
         /// <returns></returns>
-        public static IDictionary<SnapshotConfiguration, byte[]> TakeSnapshots(IEnumerable<SnapshotConfiguration> configs, Camera camera = null)
+        public static IDictionary<SnapshotConfiguration, byte[]> TakeSnapshots(IEnumerable<SnapshotConfiguration> configs)
         {
             var snapshots = new Dictionary<SnapshotConfiguration, byte[]>();
             foreach (var config in configs)
-                snapshots[config] = TakeSnapshot(config, camera);
+                snapshots[config] = TakeSnapshot(config);
 
             return snapshots;
         }
