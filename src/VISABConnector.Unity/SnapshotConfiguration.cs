@@ -13,13 +13,11 @@ namespace VISABConnector.Unity
 
         public float CameraOffset { get; set; }
 
-        public Vector3 Rotation { get; set; }
+        public Vector3 CameraRotation { get; set; }
 
         public int ImageWidth { get; set; }
 
         public int ImageHeight { get; set; }
-
-        public Camera Camera { get; set; }
 
         public bool ShouldInstantiate => InstantiationSettings != null;
     }
