@@ -15,9 +15,12 @@ namespace VISABConnector.Unity
 
         public Vector3 CameraRotation { get; set; }
 
+        public bool Orthographic { get; set; }
+
         public int ImageWidth { get; set; }
 
         public int ImageHeight { get; set; }
+
 
         public bool ShouldInstantiate => InstantiationSettings != null;
     }
