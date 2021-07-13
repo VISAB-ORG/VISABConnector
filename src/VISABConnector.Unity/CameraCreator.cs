@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace VISABConnector.Unity
 {
-    public static class CameraHelper
+    public static class CameraCreator
     {
         /// <summary>
         /// The name of the camera that is created by us, if no camera is given.
