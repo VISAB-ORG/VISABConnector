@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace VISABConnector.Unity
 {
+    /// <summary>
+    /// TODO: What is culling and what are layers?
+    /// </summary>
     public static class ImageCreator
     {
         /// <summary>
