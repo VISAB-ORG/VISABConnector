@@ -41,8 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ImageExtractor.cs" />
+    <Compile Include="CameraExtensionMethods.cs" />
+    <Compile Include="ImageCreator.cs" />
+    <Compile Include="InstantiationConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SnapshotConfiguration.cs" />
+    <Compile Include="SnapshotMethods.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Unity3D.SDK">
