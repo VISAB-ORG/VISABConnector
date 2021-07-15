@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace VISABConnector.Unity
 {
     /// <summary>
-    /// TODO: What is culling and what are layers?
+    /// TODO: Smart Instantiate
     /// </summary>
     public static class ImageCreator
     {
+        public const string LayerName = "VISAB";
+
         /// <summary>
         /// TODO: A bunch of dumb arguments checking TODO: You may also pass an existing camera.
         /// </summary>
@@ -28,25 +31,11 @@ namespace VISABConnector.Unity
 
             var gameObject = config.ShouldInstantiate ? InstantiateGameObject(config.InstantiationSettings) : GameObject.Find(config.GameObjectId);
             if (gameObject == null)
-                throw new NotImplementedException(); // TODO: If this can happend, should throw instead
+                throw new NotImplementedException(); // TODO: If this can happend, should throw 
 
+            Debug.Log(config.CameraOffset);
             camera.FocusOn(gameObject, config.CameraOffset, config.CameraRotation);
-
-            // TODO: Ask marcel what this is
-            if (camera.targetTexture == null)
-            {
-                // TODO: Does this 24 depth not clash with TextureFormat.ARGB32? How does this work
-                camera.targetTexture = new RenderTexture(height, width, 24);
-            }
-            else
-            {
-                width = camera.targetTexture.width;
-                height = camera.targetTexture.height;
-            }
-
-            // TODO: Ask marcel about this. Can this occur?
-            if (!camera.gameObject.activeInHierarchy)
-                throw new NotImplementedException();
+            camera.targetTexture = new RenderTexture(height, width, 24);
 
             var snapshot = new Texture2D(width, height, TextureFormat.ARGB32, false);
             camera.Render();
@@ -56,12 +45,14 @@ namespace VISABConnector.Unity
             var imageBytes = snapshot.EncodeToPNG();
             Debug.Log($"Took snapshot of{gameObject.name}");
 
-            // Remove instantiated gameObject
-            if (config.ShouldInstantiate)
-            {
-                GameObject.Destroy(gameObject);
+            int oldLayer = gameObject.layer;
+            gameObject.layer = LayerMask.NameToLayer(LayerName);
+            camera.cullingMask = 1 << LayerMask.NameToLayer(LayerName);
 
-            }
+            // Restore gameobject to previous state
+            gameObject.layer = oldLayer;
+            //if (config.ShouldInstantiate)
+            //    GameObject.Destroy(gameObject);
 
             // TODO: Deactivate camera?
 
@@ -99,10 +90,12 @@ namespace VISABConnector.Unity
             var resource = Resources.Load(config.PrefabPath);
             // TODO: Dont know if this will be null or throw itself
 
-            var @object = GameObject.Instantiate(resource, position: config.SpawnLocation, rotation: config.SpawnRotation);
+            var gameObject = GameObject.Instantiate(resource, position: config.SpawnLocation, rotation: config.SpawnRotation) as GameObject;
             // TODO: Dont know if this will be null or throw itself
 
-            return @object as GameObject;
+            gameObject.SetActive(true);
+
+            return gameObject;
         }
     }
 }
