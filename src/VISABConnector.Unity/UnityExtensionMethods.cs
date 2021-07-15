@@ -23,6 +23,21 @@ namespace VISABConnector.Unity
             return bounds;
         }
 
+        public static void FocusOnAbsolute(this Camera cam, GameObject obj, float absoluteYOffset, Vector3 rotationAngle)
+        {
+            Bounds bounds = obj.GetBoundsWithChildren();
+            float maxExtent = bounds.extents.magnitude;
+            cam.transform.position = bounds.center + Vector3.up * absoluteYOffset;
+            cam.transform.Rotate(rotationAngle.x, rotationAngle.y, rotationAngle.z, Space.Self);
+
+
+            Debug.Log("GameObj: " + obj + ", coordinates: " + obj.transform.position);
+            Debug.Log("Camera: " + cam + ", coordinates: " + cam.transform.position);
+
+
+            Debug.Log(bounds);
+        }
+
         public static void FocusOn(this Camera cam, GameObject focusedObject, float marginPercentage, Vector3 rotationAngle)
         {
             Bounds bounds = focusedObject.GetBoundsWithChildren();
@@ -30,10 +45,11 @@ namespace VISABConnector.Unity
             float minDistance = (maxExtent * marginPercentage) / Mathf.Sin(Mathf.Deg2Rad * cam.fieldOfView / 0.5f);
             cam.transform.position = bounds.center + Vector3.up * minDistance;
             cam.transform.Rotate(rotationAngle.x, rotationAngle.y, rotationAngle.z, Space.Self);
-
+            
             Debug.Log("GameObj: " + focusedObject + ", coordinates: " + focusedObject.transform.position);
             Debug.Log("Camera: " + cam + ", coordinates: " + cam.transform.position);
             cam.nearClipPlane = minDistance - maxExtent;
+            cam.transform.LookAt(focusedObject.transform.position);
             Debug.Log(bounds);
         }
 
@@ -44,7 +60,7 @@ namespace VISABConnector.Unity
 
             cam.transform.position = v + (Vector3.up * 10);
             Debug.Log(cam.transform.position);
-            //cam.transform.LookAt(obj.transform.position);
+            cam.transform.LookAt(obj.transform.position);
         }
     }
 }

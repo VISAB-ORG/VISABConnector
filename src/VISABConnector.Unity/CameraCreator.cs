@@ -25,7 +25,7 @@ namespace VISABConnector.Unity
 
         private static void ConfigureCamera(Camera camera)
         {
-            // TODO: Create some class that holds constants for the default creation of the camera
+            camera.transform.Rotate(new Vector3(90, 45, 0));
         }
     }
 }
