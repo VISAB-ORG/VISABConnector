@@ -77,7 +77,7 @@ namespace VISABConnector
 
         public async Task<ApiResponse<string>> SendImage(IImage image)
         {
-            var response = await RequestHandler.GetResponseAsync(HttpMethod.Get, _endpointSendImage, image, null).ConfigureAwait(false);
+            var response = await RequestHandler.GetResponseAsync(HttpMethod.Post, _endpointSendImage, image, null).ConfigureAwait(false);
             if (!response.IsSuccess && response.ErrorMessage.Contains(_sessionAlreadyClosedResponse))
                 IsActive = false;
 
