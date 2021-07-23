@@ -49,7 +49,7 @@ namespace VISABConnector.Unity
             Debug.Log("GameObj: " + focusedObject + ", coordinates: " + focusedObject.transform.position);
             Debug.Log("Camera: " + cam + ", coordinates: " + cam.transform.position);
             cam.nearClipPlane = minDistance - maxExtent;
-            cam.transform.LookAt(focusedObject.transform.position);
+            //cam.transform.LookAt(focusedObject.transform.position);
             Debug.Log(bounds);
         }
 

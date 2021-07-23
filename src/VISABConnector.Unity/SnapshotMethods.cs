@@ -60,7 +60,7 @@ namespace VISABConnector.Unity
             minimapCam.orthographic = false;
             minimapCam.cullingMask = 1 << LayerMask.NameToLayer("Shootable");
 
-            SnapshotObject(loadedObj, obj.CameraOffset, obj.CameraRotation, obj.ImageWidth, obj.ImageHeight);
+            //SnapshotObject(loadedObj, obj.CameraOffset, obj.CameraRotation, obj.ImageWidth, obj.ImageHeight);
             yield return new WaitForSeconds(1);
             loadedObj.SetActive(false);
 
@@ -84,7 +84,7 @@ namespace VISABConnector.Unity
                 minimapCam.cullingMask = 1 << LayerMask.NameToLayer("Shootable");
             }
 
-            SnapshotObject(spawnedObj, obj.CameraOffset, obj.CameraRotation, obj.ImageWidth, obj.ImageHeight);
+            //SnapshotObject(spawnedObj, obj.CameraOffset, obj.CameraRotation, obj.ImageWidth, obj.ImageHeight);
 
             minimapCam.cullingMask = oldMask;
         }

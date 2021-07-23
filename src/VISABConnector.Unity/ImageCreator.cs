@@ -27,15 +27,25 @@ namespace VISABConnector.Unity
 
             //camera = camera ?? CameraCreator.CreateCamera();
             var camera = CameraCreator.CreateCamera();
-            camera.orthographic = config.Orthographic;
+            var cameraConfig = config.CameraConfiguration;
+            camera.orthographic = cameraConfig.Orthographic;
+
+            camera.orthographicSize = cameraConfig.OrthographicSize;
 
             var gameObject = config.ShouldInstantiate ? InstantiateGameObject(config.InstantiationSettings) : GameObject.Find(config.GameObjectId);
             if (gameObject == null)
                 throw new NotImplementedException(); // TODO: If this can happend, should throw 
 
-            Debug.Log(config.CameraOffset);
-            camera.FocusOn(gameObject, config.CameraOffset, config.CameraRotation);
+            Debug.Log(cameraConfig.CameraOffset);
+            camera.FocusOn(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
             camera.targetTexture = new RenderTexture(height, width, 24);
+
+
+            int oldLayer = gameObject.layer;
+
+            SetLayerRecursively(gameObject, LayerMask.NameToLayer(LayerName));
+            //gameObject.layer = LayerMask.NameToLayer(LayerName);
+            camera.cullingMask = 1 << LayerMask.NameToLayer(LayerName);
 
             var snapshot = new Texture2D(width, height, TextureFormat.ARGB32, false);
             camera.Render();
@@ -43,14 +53,13 @@ namespace VISABConnector.Unity
             snapshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
 
             var imageBytes = snapshot.EncodeToPNG();
-            Debug.Log($"Took snapshot of{gameObject.name}");
 
-            int oldLayer = gameObject.layer;
-            gameObject.layer = LayerMask.NameToLayer(LayerName);
-            camera.cullingMask = 1 << LayerMask.NameToLayer(LayerName);
-
+            Debug.Log($"Took snapshot of {gameObject.name}");
             // Restore gameobject to previous state
-            gameObject.layer = oldLayer;
+
+            SetLayerRecursively(gameObject, oldLayer);
+
+            //gameObject.layer = oldLayer;
             //if (config.ShouldInstantiate)
             //    GameObject.Destroy(gameObject);
 
@@ -96,6 +105,24 @@ namespace VISABConnector.Unity
             gameObject.SetActive(true);
 
             return gameObject;
+        }
+
+        /// <summary>
+        /// Assigns Layer to all children of gameobjects
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="layer"></param>
+        public static void SetLayerRecursively(GameObject obj, int layer)
+        {
+            obj.layer = layer;
+
+            foreach (Transform child in obj.transform)
+            {
+
+                obj.layer = layer;
+
+                SetLayerRecursively(child.gameObject, layer);
+            }
         }
     }
 }

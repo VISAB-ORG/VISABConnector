@@ -7,6 +7,8 @@ namespace VISABConnector.Unity
     {
         public InstantiationConfiguration InstantiationSettings { get; set; }
 
+        public CameraConfiguration CameraConfiguration { get; set; }
+
         /// <summary>
         /// TODO: Really not name? GameObject.Find has a parameter with name that is used by us
         /// </summary>
@@ -15,12 +17,6 @@ namespace VISABConnector.Unity
         }
 
         public string GameObjectId { get; set; }
-
-        public float CameraOffset { get; set; }
-        
-        public Vector3 CameraRotation { get; set; }
-
-        public bool Orthographic { get; set; }
 
         public int ImageWidth { get; set; }
 

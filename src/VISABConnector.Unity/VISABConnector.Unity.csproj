@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VISABConnector.Unity</RootNamespace>
     <AssemblyName>VISABConnector.Unity</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CameraConfiguration.cs" />
     <Compile Include="CameraCreator.cs" />
     <Compile Include="UnityExtensionMethods.cs" />
     <Compile Include="ImageCreator.cs" />
@@ -56,4 +58,7 @@
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>python F:\Projekte\GitHub\vscode_macro\copy_assemblies.py</PostBuildEvent>
+  </PropertyGroup>
 </Project>
