@@ -43,8 +43,10 @@ namespace VISABConnector.Unity
             float maxExtent = bounds.extents.magnitude;
             float minDistance = (maxExtent * marginPercentage) / Mathf.Sin(Mathf.Deg2Rad * cam.fieldOfView / 0.5f);
             cam.transform.position = bounds.center + Vector3.up * minDistance;
+            cam.transform.rotation = Quaternion.identity;
+            cam.transform.Rotate(CameraCreator.DefaultRotation);
             cam.transform.Rotate(rotationAngle.x, rotationAngle.y, rotationAngle.z, Space.Self);
-            
+
             Debug.Log("GameObj: " + focusedObject + ", coordinates: " + focusedObject.transform.position);
             Debug.Log("Camera: " + cam + ", coordinates: " + cam.transform.position);
             cam.nearClipPlane = minDistance - maxExtent;
