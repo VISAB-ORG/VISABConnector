@@ -28,8 +28,10 @@ namespace VISABConnector.Unity
             Bounds bounds = obj.GetBoundsWithChildren();
             float maxExtent = bounds.extents.magnitude;
             cam.transform.position = bounds.center + Vector3.up * absoluteYOffset;
-            cam.transform.Rotate(rotationAngle.x, rotationAngle.y, rotationAngle.z, Space.Self);
 
+            cam.transform.rotation = Quaternion.identity;
+            cam.transform.Rotate(CameraCreator.DefaultRotation);
+            cam.transform.Rotate(rotationAngle.x, rotationAngle.y, rotationAngle.z, Space.Self);
 
             Debug.Log("GameObj: " + obj + ", coordinates: " + obj.transform.position);
             Debug.Log("Camera: " + cam + ", coordinates: " + cam.transform.position);
@@ -43,6 +45,7 @@ namespace VISABConnector.Unity
             float maxExtent = bounds.extents.magnitude;
             float minDistance = (maxExtent * marginPercentage) / Mathf.Sin(Mathf.Deg2Rad * cam.fieldOfView / 0.5f);
             cam.transform.position = bounds.center + Vector3.up * minDistance;
+            
             cam.transform.rotation = Quaternion.identity;
             cam.transform.Rotate(CameraCreator.DefaultRotation);
             cam.transform.Rotate(rotationAngle.x, rotationAngle.y, rotationAngle.z, Space.Self);

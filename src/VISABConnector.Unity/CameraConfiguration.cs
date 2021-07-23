@@ -12,6 +12,6 @@ namespace VISABConnector.Unity
 
         public bool Orthographic { get; set; }
 
-        public float OrthographicSize { get; set; }
+        public float OrthographicSize { get; set; } = 1;
     }
 }

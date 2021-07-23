@@ -35,28 +35,43 @@ namespace VISABConnector.Unity
             var camera = CameraCreator.CreateCamera();
             var cameraConfig = config.CameraConfiguration;
             camera.orthographic = cameraConfig.Orthographic;
-
-            camera.orthographicSize = cameraConfig.OrthographicSize;
+            if (cameraConfig.Orthographic)
+                camera.orthographicSize = cameraConfig.OrthographicSize;
 
             var gameObject = config.ShouldInstantiate ? InstantiateGameObject(config.InstantiationSettings) : GameObject.Find(config.GameObjectId);
             if (gameObject == null)
                 throw new NotImplementedException(); // TODO: If this can happend, should throw 
 
-            Debug.Log(cameraConfig.CameraOffset);
-            camera.FocusOn(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
-            camera.targetTexture = new RenderTexture(height, width, 24);
-
             int oldLayer = gameObject.layer;
 
             SetLayerRecursively(gameObject, LayerMask.NameToLayer(VISABLayerName));
             camera.cullingMask = 1 << LayerMask.NameToLayer(VISABLayerName);
+            camera.backgroundColor = Color.clear;
 
-            var snapshot = new Texture2D(width, height, TextureFormat.ARGB32, false);
+            Debug.Log($"Offset: {cameraConfig.CameraOffset} is absolute? {cameraConfig.UseAbsoluteOffset}");
+            if (cameraConfig.UseAbsoluteOffset)
+                camera.FocusOnAbsolute(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
+            else
+                camera.FocusOn(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
+
+            // Take the snapshot
+            camera.targetTexture = RenderTexture.GetTemporary(width, height, 24);
             camera.Render();
-            RenderTexture.active = camera.targetTexture;
-            snapshot.ReadPixels(new Rect(0, 0, width, height), 0, 0);
 
-            var imageBytes = snapshot.EncodeToPNG();
+            // Activate the temporary render texture
+            RenderTexture previouslyActiveRenderTexture = RenderTexture.active;
+            RenderTexture.active = camera.targetTexture;
+
+            var texture = new Texture2D(width, height, TextureFormat.ARGB32, false);
+            texture.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+            texture.Apply(false);
+
+            RenderTexture.active = previouslyActiveRenderTexture;
+
+            camera.targetTexture = null;
+            RenderTexture.ReleaseTemporary(camera.targetTexture);
+
+            var imageBytes = texture.EncodeToPNG();
 
             Debug.Log($"Took snapshot of {gameObject.name}");
 
