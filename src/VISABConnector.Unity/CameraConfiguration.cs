@@ -6,6 +6,8 @@ namespace VISABConnector.Unity
     {
         public float CameraOffset { get; set; }
 
+        public bool UseAbsoluteOffset { get; set; }
+
         public Vector3 CameraRotation { get; set; }
 
         public bool Orthographic { get; set; }

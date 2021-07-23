@@ -34,7 +34,6 @@ namespace VISABConnector.Unity
             Debug.Log("GameObj: " + obj + ", coordinates: " + obj.transform.position);
             Debug.Log("Camera: " + cam + ", coordinates: " + cam.transform.position);
 
-
             Debug.Log(bounds);
         }
 

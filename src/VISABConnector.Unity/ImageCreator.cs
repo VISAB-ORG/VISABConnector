@@ -10,7 +10,7 @@ namespace VISABConnector.Unity
     /// </summary>
     public static class ImageCreator
     {
-        public const string LayerName = "VISAB";
+        public const string VISABLayerName = "VISAB";
 
         /// <summary>
         /// TODO: A bunch of dumb arguments checking TODO: You may also pass an existing camera.
@@ -22,10 +22,16 @@ namespace VISABConnector.Unity
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
+            if (LayerMask.NameToLayer(VISABLayerName) == -1)
+            {
+                throw new Exception($"ImageCreator uses Unity layers to take screenshots of single GameObjects. " +
+                                    $"Create a layer named {VISABLayerName} in the Unity Editor.");
+            }
+
             int width = config.ImageWidth > 0 ? config.ImageWidth : throw new ArgumentException("Image width was smaller than 0!");
             int height = config.ImageHeight > 0 ? config.ImageHeight : throw new ArgumentException("Image height was smaller than 0!");
 
-            //camera = camera ?? CameraCreator.CreateCamera();
+            // camera = camera ?? CameraCreator.CreateCamera();
             var camera = CameraCreator.CreateCamera();
             var cameraConfig = config.CameraConfiguration;
             camera.orthographic = cameraConfig.Orthographic;
@@ -40,12 +46,10 @@ namespace VISABConnector.Unity
             camera.FocusOn(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
             camera.targetTexture = new RenderTexture(height, width, 24);
 
-
             int oldLayer = gameObject.layer;
 
-            SetLayerRecursively(gameObject, LayerMask.NameToLayer(LayerName));
-            //gameObject.layer = LayerMask.NameToLayer(LayerName);
-            camera.cullingMask = 1 << LayerMask.NameToLayer(LayerName);
+            SetLayerRecursively(gameObject, LayerMask.NameToLayer(VISABLayerName));
+            camera.cullingMask = 1 << LayerMask.NameToLayer(VISABLayerName);
 
             var snapshot = new Texture2D(width, height, TextureFormat.ARGB32, false);
             camera.Render();
@@ -55,11 +59,10 @@ namespace VISABConnector.Unity
             var imageBytes = snapshot.EncodeToPNG();
 
             Debug.Log($"Took snapshot of {gameObject.name}");
-            // Restore gameobject to previous state
 
+            // Restore gameobject to previous state
             SetLayerRecursively(gameObject, oldLayer);
 
-            //gameObject.layer = oldLayer;
             //if (config.ShouldInstantiate)
             //    GameObject.Destroy(gameObject);
 
