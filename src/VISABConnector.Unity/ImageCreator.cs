@@ -31,7 +31,6 @@ namespace VISABConnector.Unity
             int width = config.ImageWidth > 0 ? config.ImageWidth : throw new ArgumentException("Image width was smaller than 0!");
             int height = config.ImageHeight > 0 ? config.ImageHeight : throw new ArgumentException("Image height was smaller than 0!");
 
-            // camera = camera ?? CameraCreator.CreateCamera();
             var camera = CameraCreator.CreateCamera();
             var cameraConfig = config.CameraConfiguration;
             camera.orthographic = cameraConfig.Orthographic;
@@ -44,10 +43,12 @@ namespace VISABConnector.Unity
 
             int oldLayer = gameObject.layer;
 
+            // Set up camera for taking screenshot
             SetLayerRecursively(gameObject, LayerMask.NameToLayer(VISABLayerName));
             camera.cullingMask = 1 << LayerMask.NameToLayer(VISABLayerName);
-            //camera.backgroundColor = Color.clear;
+            camera.clearFlags = CameraClearFlags.Depth;
 
+            // Focus the camera
             Debug.Log($"Offset: {cameraConfig.CameraOffset} is absolute? {cameraConfig.UseAbsoluteOffset}");
             if (cameraConfig.UseAbsoluteOffset)
                 camera.FocusOnAbsolute(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
@@ -55,22 +56,7 @@ namespace VISABConnector.Unity
                 camera.FocusOn(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
 
             // Take the snapshot
-            camera.targetTexture = RenderTexture.GetTemporary(width, height, 24);
-            camera.Render();
-
-            // Activate the temporary render texture
-            RenderTexture previouslyActiveRenderTexture = RenderTexture.active;
-            RenderTexture.active = camera.targetTexture;
-
-            var texture = new Texture2D(width, height, TextureFormat.ARGB32, false);
-            texture.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-            texture.Apply(false);
-
-            RenderTexture.active = previouslyActiveRenderTexture;
-
-            camera.targetTexture = null;
-            RenderTexture.ReleaseTemporary(camera.targetTexture);
-
+            var texture = MakeTexture(camera, width, height);
             var imageBytes = texture.EncodeToPNG();
 
             Debug.Log($"Took snapshot of {gameObject.name}");
@@ -84,6 +70,25 @@ namespace VISABConnector.Unity
             // TODO: Deactivate camera?
 
             return imageBytes;
+        }
+
+        private static Texture2D MakeTexture(Camera camera, int width, int height)
+        {
+            camera.targetTexture = RenderTexture.GetTemporary(width, height, 32);
+            camera.Render();
+
+            RenderTexture.active = camera.targetTexture;
+
+            var texture = new Texture2D(width, height, TextureFormat.ARGB32, false);
+            texture.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+            texture.Apply();
+
+            RenderTexture.active = null;
+            camera.targetTexture = null;
+
+            RenderTexture.ReleaseTemporary(camera.targetTexture);
+
+            return texture;
         }
 
         /// <summary>
