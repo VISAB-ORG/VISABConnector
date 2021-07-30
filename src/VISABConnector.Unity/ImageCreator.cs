@@ -39,14 +39,14 @@ namespace VISABConnector.Unity
                 camera.orthographicSize = cameraConfig.OrthographicSize;
 
             var gameObject = config.ShouldInstantiate ? InstantiateGameObject(config.InstantiationSettings) : GameObject.Find(config.GameObjectId);
-            if (gameObject == null)
-                throw new NotImplementedException(); // TODO: If this can happend, should throw 
+            if (!config.ShouldInstantiate && gameObject == null)
+                throw new Exception($"There is no GameObject with name {config.GameObjectId}!");
 
             int oldLayer = gameObject.layer;
 
             SetLayerRecursively(gameObject, LayerMask.NameToLayer(VISABLayerName));
             camera.cullingMask = 1 << LayerMask.NameToLayer(VISABLayerName);
-            camera.backgroundColor = Color.clear;
+            //camera.backgroundColor = Color.clear;
 
             Debug.Log($"Offset: {cameraConfig.CameraOffset} is absolute? {cameraConfig.UseAbsoluteOffset}");
             if (cameraConfig.UseAbsoluteOffset)
@@ -90,7 +90,6 @@ namespace VISABConnector.Unity
         /// TODO: You may also pass an existing camera.
         /// </summary>
         /// <param name="configs"></param>
-        /// <param name="camera"></param>
         /// <returns></returns>
         public static IDictionary<SnapshotConfiguration, byte[]> TakeSnapshots(IEnumerable<SnapshotConfiguration> configs)
         {
@@ -115,10 +114,12 @@ namespace VISABConnector.Unity
                 throw new ArgumentException("Configuration given has no prefab path!");
 
             var resource = Resources.Load(config.PrefabPath);
-            // TODO: Dont know if this will be null or throw itself
+            if (resource == null)
+                throw new Exception($"Could not load prefab from path {config.PrefabPath}");
 
             var gameObject = GameObject.Instantiate(resource, position: config.SpawnLocation, rotation: config.SpawnRotation) as GameObject;
-            // TODO: Dont know if this will be null or throw itself
+            if (gameObject == null)
+                throw new Exception($"Could not instantiate GameObject!");
 
             gameObject.SetActive(true);
 
@@ -133,10 +134,8 @@ namespace VISABConnector.Unity
         public static void SetLayerRecursively(GameObject obj, int layer)
         {
             obj.layer = layer;
-
             foreach (Transform child in obj.transform)
             {
-
                 obj.layer = layer;
 
                 SetLayerRecursively(child.gameObject, layer);
