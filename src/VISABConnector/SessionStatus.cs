@@ -38,11 +38,6 @@ namespace VISABConnector
         public int ReceivedImages { get; internal set; }
 
         /// <summary>
-        /// The host name of the machine that opened the session.
-        /// </summary>
-        public string HostName { get; internal set; }
-
-        /// <summary>
         /// The ip of the machine that opened the session.
         /// </summary>
         public string Ip { get; internal set; }
