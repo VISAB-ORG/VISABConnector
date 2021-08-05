@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace VISABConnector.Example
+namespace VISABConnector.Example.Tetris
 {
     public class DefaultExample : MonoBehaviour
     {

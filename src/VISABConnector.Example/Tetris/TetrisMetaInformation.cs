@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace VISABConnector.Example
+namespace VISABConnector.Example.Tetris
 {
     public class TetrisMetaInformation : IMetaInformation
     {

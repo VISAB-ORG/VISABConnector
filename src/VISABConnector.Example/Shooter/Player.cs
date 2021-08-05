@@ -1,6 +1,6 @@
-﻿namespace VISABConnector.Example
+﻿namespace VISABConnector.Example.Shooter
 {
-    public class Player.Tetris
+    public class Player
     {
         public string Name { get; set; }
 

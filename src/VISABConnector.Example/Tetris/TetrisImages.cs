@@ -1,4 +1,4 @@
-﻿namespace VISABConnector.Example
+﻿namespace VISABConnector.Example.Tetris
 {
     public class TetrisImages : IImageContainer
     {

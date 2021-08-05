@@ -42,8 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LoopBasedExample.cs" />
+    <Compile Include="Shooter\LoopBasedExample.cs" />
     <Compile Include="OtherFeaturesExample.cs" />
+    <Compile Include="Shooter\Player.cs" />
+    <Compile Include="Shooter\ShooterImages.cs" />
+    <Compile Include="Shooter\ShooterMetaInformation.cs" />
+    <Compile Include="Shooter\ShooterStatistics.cs" />
     <Compile Include="Tetris\Player.cs" />
     <Compile Include="Tetris\DefaultExample.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
