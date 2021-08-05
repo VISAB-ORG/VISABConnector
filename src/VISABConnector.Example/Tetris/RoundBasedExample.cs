@@ -16,7 +16,7 @@ namespace VISABConnector.Example.Tetris
             };
 
             RoundBasedSession.MessageAddedEvent += m => Debug.Log(m);
-            var success = RoundBasedSession.StartSessionAsync(metaInformation, "http://localhost", 2673, 1).Result;
+            bool success = RoundBasedSession.StartSessionAsync(metaInformation, "http://localhost", 2673, 1).Result;
             if (!success)
                 throw new Exception();
 

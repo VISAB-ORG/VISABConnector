@@ -20,7 +20,7 @@ namespace VISABConnector.Example.Shooter
             };
 
             LoopBasedSession.MessageAddedEvent += m => Debug.Log(m);
-            var success = LoopBasedSession.StartSessionAsync(metaInformation, "http://localhost", 2673, 1).Result;
+            bool success = LoopBasedSession.StartSessionAsync(metaInformation, "http://localhost", 2673, 1).Result;
             if (!success)
                 throw new Exception();
 

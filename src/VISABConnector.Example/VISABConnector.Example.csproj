@@ -43,7 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Shooter\LoopBasedExample.cs" />
-    <Compile Include="OtherFeaturesExample.cs" />
+    <Compile Include="ReciveFileExample.cs" />
     <Compile Include="Shooter\Player.cs" />
     <Compile Include="Shooter\ShooterImages.cs" />
     <Compile Include="Shooter\ShooterMetaInformation.cs" />
