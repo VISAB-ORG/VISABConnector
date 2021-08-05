@@ -6,10 +6,18 @@ namespace VISABConnector.Example
     {
         private IVISABSession session;
 
-        private async void OnEndGame()
+        private async void OnEndGame_Default()
         {
-            await session.CloseSession();
-            string file = await session.GetCreatedFile();
+            await session.CloseSessionAsync();
+            ApiResponse<string> file = await session.GetCreatedFileAsync();
+            Debug.Log(file.Content);
+        }
+
+        private async void OnEndGame_RoundBased()
+        {
+            await RoundBasedSession.CloseSessionAsync();
+            string file = await RoundBasedSession.GetFileAsync();
+            Debug.Log(file.Content);
         }
 
         public void ReceiveFile()

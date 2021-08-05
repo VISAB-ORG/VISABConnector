@@ -58,7 +58,7 @@ namespace VISABConnector
 
         public Guid SessionId { get; }
 
-        public async Task<ApiResponse<string>> CloseSession()
+        public async Task<ApiResponse<string>> CloseSessionAsync()
         {
             var response = await RequestHandler.GetResponseAsync(HttpMethod.Get, _endpointCloseSession, null, null).ConfigureAwait(false);
 
@@ -68,14 +68,14 @@ namespace VISABConnector
             return response;
         }
 
-        public async Task<ApiResponse<string>> GetCreatedFile()
+        public async Task<ApiResponse<string>> GetCreatedFileAsync()
         {
             var queryParameters = new Dictionary<string, string> { { "sessionid", SessionId.ToString() } };
 
             return await RequestHandler.GetResponseAsync(HttpMethod.Get, _endpointGetFile, null, queryParameters).ConfigureAwait(false);
         }
 
-        public async Task<ApiResponse<string>> SendImage(IImageContainer image)
+        public async Task<ApiResponse<string>> SendImagesAsync(IImageContainer image)
         {
             var response = await RequestHandler.GetResponseAsync(HttpMethod.Post, _endpointSendImage, image, null).ConfigureAwait(false);
             if (!response.IsSuccess && response.ErrorMessage.Contains(_sessionAlreadyClosedResponse))
@@ -84,7 +84,7 @@ namespace VISABConnector
             return response;
         }
 
-        public async Task<ApiResponse<string>> SendStatistics(IStatistics statistics)
+        public async Task<ApiResponse<string>> SendStatisticsAsync(IStatistics statistics)
         {
             var response = await RequestHandler.GetResponseAsync(HttpMethod.Post, _endpointSendStatistics, statistics, null).ConfigureAwait(false);
             if (!response.IsSuccess && response.ErrorMessage.Contains(_sessionAlreadyClosedResponse))

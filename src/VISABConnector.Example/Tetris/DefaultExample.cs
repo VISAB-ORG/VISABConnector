@@ -18,7 +18,7 @@ namespace VISABConnector.Example.Tetris
             };
 
             // If we are in an asynchronous (async) method, we should use await here instead!
-            ApiResponse<IVISABSession> sessionResponse = api.InitiateSession(metaInformation).Result;
+            ApiResponse<IVISABSession> sessionResponse = api.InitiateSessionAsync(metaInformation).Result;
             if (sessionResponse.IsSuccess)
                 session = sessionResponse.Content;
             else
@@ -40,14 +40,14 @@ namespace VISABConnector.Example.Tetris
             };
 
             // If this is not an asynchronous method, we have to use block by using .Result instead again.
-            ApiResponse<string> response = await session.SendStatistics(statistics);
+            ApiResponse<string> response = await session.SendStatisticsAsync(statistics);
             if (!response.IsSuccess)
                 Debug.Log(response.ErrorMessage);
         }
 
         private async void OnGameEnded()
         {
-            ApiResponse<string> response = await session.CloseSession();
+            ApiResponse<string> response = await session.CloseSessionAsync();
             if (!response.IsSuccess)
                 Debug.Log(response.ErrorMessage);
         }
