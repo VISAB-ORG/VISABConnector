@@ -4,9 +4,9 @@ namespace VISABConnector.Example.Shooter
 {
     public class PlayerStatistics
     {
-        public int Deaths { get; set; }
-
         public int Kills { get; set; }
+
+        public int Deaths { get; set; }
     }
 
     public class ShooterStatistics : IStatistics
