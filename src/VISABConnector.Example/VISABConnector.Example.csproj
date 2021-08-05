@@ -42,12 +42,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Player.cs" />
-    <Compile Include="TetrisGameController.cs" />
+    <Compile Include="LoopBasedExample.cs" />
+    <Compile Include="OtherFeaturesExample.cs" />
+    <Compile Include="Tetris\Player.cs" />
+    <Compile Include="Tetris\DefaultExample.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TetrisImages.cs" />
-    <Compile Include="TetrisMetaInformation.cs" />
-    <Compile Include="TetrisStatistics.cs" />
+    <Compile Include="Tetris\RoundBasedExample.cs" />
+    <Compile Include="Tetris\TetrisImages.cs" />
+    <Compile Include="Tetris\TetrisMetaInformation.cs" />
+    <Compile Include="Tetris\TetrisStatistics.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VISABConnector.Unity\VISABConnector.Unity.csproj">

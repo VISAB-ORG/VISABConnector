@@ -4,26 +4,23 @@ using UnityEngine;
 
 namespace VISABConnector.Example
 {
-    public class TetrisGameController : MonoBehaviour
+    public class RoundBasedExample : MonoBehaviour
     {
         private IVISABSession session;
 
         private void Awake()
         {
-            var api = new VISABApi("http://localhost", 2673, 1);
-
             var metaInformation = new TetrisMetaInformation
             {
                 PlayerNames = new List<string> { "Horst", "Dieter" }
             };
 
-            // If we are in an asynchronous (async) method, we should use await here instead!
-            var sessionResponse = api.InitiateSession(metaInformation).Result;
-            if (sessionResponse.IsSuccess)
-                session = sessionResponse.Content;
-            else
-                throw new Exception(sessionResponse.ErrorMessage);
+            RoundBasedSession.MessageAddedEvent += m => Debug.Log(m);
+            var success = RoundBasedSession.StartSessionAsync(metaInformation, "http://localhost", 2673, 1).Result;
+            if (!success)
+                throw new Exception();
 
+            session = RoundBasedSession.Session;
             // TODO: Add VISABConnector.Unity example
         }
 
@@ -40,16 +37,12 @@ namespace VISABConnector.Example
             };
 
             // If this is not an asynchronous method, we have to use block by using .Result instead again.
-            var response = await session.SendStatistics(statistics);
-            if (!response.IsSuccess)
-                Debug.Log(response.ErrorMessage);
+            await RoundBasedSession.SendStatisticsAsync(statistics);
         }
 
         private async void OnGameEnded()
         {
-            var response = await session.CloseSession();
-            if (!response.IsSuccess)
-                Debug.Log(response.ErrorMessage);
+            await RoundBasedSession.CloseSessionAsync();
         }
     }
 }

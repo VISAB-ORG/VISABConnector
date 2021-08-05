@@ -6,10 +6,7 @@ using System.Threading.Tasks;
 
 namespace VISABConnector.Example
 {
-    public class Player
+    public class OtherFeaturesExample
     {
-        public string Name { get; set; }
-
-        public int Score { get; set; }
     }
 }
