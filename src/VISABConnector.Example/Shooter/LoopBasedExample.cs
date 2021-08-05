@@ -46,6 +46,9 @@ namespace VISABConnector.Example.Shooter
 
         private async void OnGameEnded()
         {
+            // Stop the infinite statistics loop
+            cts.Cancel();
+
             await LoopBasedSession.CloseSessionAsync();
         }
     }

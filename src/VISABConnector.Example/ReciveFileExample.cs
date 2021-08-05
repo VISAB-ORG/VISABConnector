@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Threading;
+using UnityEngine;
 
 namespace VISABConnector.Example
 {
@@ -17,12 +19,24 @@ namespace VISABConnector.Example
         {
             await RoundBasedSession.CloseSessionAsync();
             string file = await RoundBasedSession.GetFileAsync();
-            Debug.Log(file.Content);
+            Debug.Log(file);
         }
 
-        public void ReceiveFile()
+        private void Awake()
         {
+            // Exclude from sample.
+            var cts = new CancellationTokenSource();
 
+            // Initiate session
+
+            Action<string> fileReceivedHandler = json => System.IO.File.WriteAllText("MyVISABFile.visab2", json);
+            LoopBasedSession.StartStatisticsLoopAsync(GetStatistics, () => true, 100, cts.Token, queryFile: true);
+        }
+
+        // Exclude from sample.
+        private IStatistics GetStatistics()
+        {
+            return null;
         }
     }
 }
