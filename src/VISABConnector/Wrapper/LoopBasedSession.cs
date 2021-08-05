@@ -5,12 +5,6 @@ using System.Threading.Tasks;
 namespace VISABConnector
 {
     /// <summary>
-    /// The file consumer delegate type.
-    /// </summary>
-    /// <param name="json"></param>
-    public delegate void FileConsumer(string json);
-
-    /// <summary>
     /// A wrapper class for communicating with the VISAB WebApi in games that sent data continously.
     /// </summary>
     public static class LoopBasedSession
@@ -22,13 +16,15 @@ namespace VISABConnector
 
         /// <summary>
         /// Event that will be invoked when a saved file is received.
+        /// The argument is the json string of the saved file.
         /// </summary>
-        public static event FileConsumer FileReceivedEvent;
+        public static event Action<string> FileReceivedEvent;
 
         /// <summary>
         /// Event that will be invoked when a log message should be written.
+        /// The argument contains the message.
         /// </summary>
-        public static event MessageConsumer MessageAddedEvent;
+        public static event Action<string> MessageAddedEvent;
 
         /// <summary>
         /// The file that was created and saved by the VISAB WebApi.
@@ -51,7 +47,7 @@ namespace VISABConnector
             // Close the VISAB api session
             WriteLog($"Closing session with VISAB WebApi.\nSessionId: {Session.SessionId}");
 
-            var response = await Session.CloseSession().ConfigureAwait(false);
+            var response = await Session.CloseSessionAsync().ConfigureAwait(false);
             if (response.IsSuccess)
                 WriteLog("Closed session at VISAB WebApi.");
             else
@@ -73,7 +69,7 @@ namespace VISABConnector
             }
 
             WriteLog("Making request to receive file from VISAB WebApi.");
-            var response = await Session.GetCreatedFile().ConfigureAwait(false);
+            var response = await Session.GetCreatedFileAsync().ConfigureAwait(false);
             if (response.IsSuccess)
             {
                 WriteLog($"Received file from VISAB WebApi.\n{response.Content}");
@@ -92,7 +88,7 @@ namespace VISABConnector
         /// </summary>
         /// <param name="image">The image to send</param>
         /// <returns>True if successfully sent</returns>
-        public static async Task<bool> SendImagesAsync(IImage image)
+        public static async Task<bool> SendImagesAsync(IImageContainer image)
         {
             if (Session == null || !Session.IsActive)
             {
@@ -100,7 +96,7 @@ namespace VISABConnector
                 return false;
             }
 
-            var response = await Session.SendImage(image).ConfigureAwait(false);
+            var response = await Session.SendImagesAsync(image).ConfigureAwait(false);
             if (response.IsSuccess)
                 WriteLog($"Send images to VISAB!");
             else
@@ -124,18 +120,18 @@ namespace VISABConnector
 
             WriteLog("Starting to initalize Session with VISAB WebApi.");
             // Initializes the VISAB transmission session
-            var response = await visabApi.InitiateSession(metaInformation).ConfigureAwait(false);
+            var response = await visabApi.InitiateSessionAsync(metaInformation).ConfigureAwait(false);
             if (response.IsSuccess)
             {
                 Session = response.Content;
                 WriteLog($"Initialized Session with VISAB WebApi.\nSessionId: {Session.SessionId}");
+
                 return true;
             }
-            else
-            {
-                WriteLog($"Failed to initiate session with VISAB WebApi.\nErrorMessage: {response.ErrorMessage}");
-                return false;
-            }
+
+            WriteLog($"Failed to initiate session with VISAB WebApi.\nErrorMessage: {response.ErrorMessage}");
+
+            return false;
         }
 
         /// <summary>
@@ -171,7 +167,7 @@ namespace VISABConnector
         /// Whether to break out of the loop if sending statistics fails
         /// </param>
         /// <param name="queryFile">Whether to query the created file after the session was closed</param>
-        public static async void StartStatisticsLoopAsync(Func<IVISABStatistics> statisticsFunc, Func<bool> shouldSend, int sentDelay, CancellationToken cancellationToken, bool breakOnFailed = true, bool queryFile = false)
+        public static async void StartStatisticsLoopAsync(Func<IStatistics> statisticsFunc, Func<bool> shouldSend, int sentDelay, CancellationToken cancellationToken, bool breakOnFailed = true, bool queryFile = false)
         {
             try
             {
@@ -219,7 +215,7 @@ namespace VISABConnector
         /// </summary>
         /// <param name="statistics">The statistics to send</param>
         /// <returns>True if successfully sent</returns>
-        private static async Task<bool> SendStatisticsAsync(IVISABStatistics statistics)
+        private static async Task<bool> SendStatisticsAsync(IStatistics statistics)
         {
             if (Session == null || !Session.IsActive)
             {
@@ -227,7 +223,7 @@ namespace VISABConnector
                 return false;
             }
 
-            var response = await Session.SendStatistics(statistics).ConfigureAwait(false);
+            var response = await Session.SendStatisticsAsync(statistics).ConfigureAwait(false);
             if (response.IsSuccess)
                 WriteLog($"Send statistics to VISAB!");
             else

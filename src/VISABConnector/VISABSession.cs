@@ -13,26 +13,30 @@ namespace VISABConnector
         /// <summary>
         /// Relative endpoint for closing session to VISAB API
         /// </summary>
-        private const string EndpointCloseSession = "session/close";
+        private const string _endpointCloseSession = "session/close";
 
         /// <summary>
         /// Relative endpoint for getting the created file at VISAB Api.
         /// </summary>
-        private const string EndpointGetFile = "file/get";
+        private const string _endpointGetFile = "file/get";
 
         /// <summary>
         /// Relative endpoint for sending images to VISAB API.
         /// </summary>
-        private const string EndpointSendImage = "send/image";
+        private const string _endpointSendImage = "send/image";
 
         /// <summary>
         /// Relative endpoint for sending statistics to VISAB API
         /// </summary>
-        private const string EndpointSendStatistics = "send/statistics";
+        private const string _endpointSendStatistics = "send/statistics";
 
         #endregion VISAB WebApi endpoints
 
-        private const string SessionAlreadyClosedResponse = "SESSION_ALREADY_CLOSED";
+        /// <summary>
+        /// If a response message when sending images or statistics returned this, the session was
+        /// already closed.
+        /// </summary>
+        private const string _sessionAlreadyClosedResponse = "SESSION_ALREADY_CLOSED";
 
         /// <summary>
         /// </summary>
@@ -44,24 +48,19 @@ namespace VISABConnector
             Game = game;
             SessionId = sessionId;
             RequestHandler = requestHandler;
-            IsActive = true;
         }
-
-        public event EventHandler<ClosingEventArgs> CloseSessionEvent;
 
         public string Game { get; }
 
-        public bool IsActive { get; private set; }
+        public bool IsActive { get; private set; } = true;
 
         public IVISABRequestHandler RequestHandler { get; }
 
         public Guid SessionId { get; }
 
-        public async Task<ApiResponse<string>> CloseSession()
+        public async Task<ApiResponse<string>> CloseSessionAsync()
         {
-            CloseSessionEvent?.Invoke(this, new ClosingEventArgs { RequestHandler = RequestHandler });
-
-            var response = await RequestHandler.GetResponseAsync(HttpMethod.Get, EndpointCloseSession, null, null).ConfigureAwait(false);
+            var response = await RequestHandler.GetResponseAsync(HttpMethod.Get, _endpointCloseSession, null, null).ConfigureAwait(false);
 
             if (response.IsSuccess)
                 IsActive = false;
@@ -69,26 +68,26 @@ namespace VISABConnector
             return response;
         }
 
-        public async Task<ApiResponse<string>> GetCreatedFile()
+        public async Task<ApiResponse<string>> GetCreatedFileAsync()
         {
-            var @params = new List<string> { $"sessionid={SessionId}" };
+            var queryParameters = new Dictionary<string, string> { { "sessionid", SessionId.ToString() } };
 
-            return await RequestHandler.GetResponseAsync(HttpMethod.Get, EndpointGetFile, @params, null).ConfigureAwait(false);
+            return await RequestHandler.GetResponseAsync(HttpMethod.Get, _endpointGetFile, null, queryParameters).ConfigureAwait(false);
         }
 
-        public async Task<ApiResponse<string>> SendImage(IImage image)
+        public async Task<ApiResponse<string>> SendImagesAsync(IImageContainer image)
         {
-            var response = await RequestHandler.GetResponseAsync(HttpMethod.Get, EndpointSendImage, null, image).ConfigureAwait(false);
-            if (!response.IsSuccess && response.ErrorMessage.Contains(SessionAlreadyClosedResponse))
+            var response = await RequestHandler.GetResponseAsync(HttpMethod.Post, _endpointSendImage, image, null).ConfigureAwait(false);
+            if (!response.IsSuccess && response.ErrorMessage.Contains(_sessionAlreadyClosedResponse))
                 IsActive = false;
 
             return response;
         }
 
-        public async Task<ApiResponse<string>> SendStatistics(IVISABStatistics statistics)
+        public async Task<ApiResponse<string>> SendStatisticsAsync(IStatistics statistics)
         {
-            var response = await RequestHandler.GetResponseAsync(HttpMethod.Post, EndpointSendStatistics, null, statistics).ConfigureAwait(false);
-            if (!response.IsSuccess && response.ErrorMessage.Contains(SessionAlreadyClosedResponse))
+            var response = await RequestHandler.GetResponseAsync(HttpMethod.Post, _endpointSendStatistics, statistics, null).ConfigureAwait(false);
+            if (!response.IsSuccess && response.ErrorMessage.Contains(_sessionAlreadyClosedResponse))
                 IsActive = false;
 
             return response;

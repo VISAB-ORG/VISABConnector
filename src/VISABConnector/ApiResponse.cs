@@ -1,8 +1,9 @@
 ﻿namespace VISABConnector
 {
     /// <summary>
-    /// Is returned when requests to the VISAB WebApi are made.
+    /// Represents a response that is made by the VISAB WebApi.
     /// </summary>
+    /// <typeparam name="T">The type of the content</typeparam>
     public class ApiResponse<T>
     {
         /// <summary>
