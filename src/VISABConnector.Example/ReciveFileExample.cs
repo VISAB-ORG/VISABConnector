@@ -29,7 +29,9 @@ namespace VISABConnector.Example
 
             // Initiate session
 
-            Action<string> fileReceivedHandler = json => System.IO.File.WriteAllText("MyVISABFile.visab2", json);
+            Action<string> onFileReceived = json => System.IO.File.WriteAllText("MyVISABFile.visab2", json);
+            LoopBasedSession.FileReceivedEvent += onFileReceived;
+
             LoopBasedSession.StartStatisticsLoopAsync(GetStatistics, () => true, 100, cts.Token, queryFile: true);
         }
 
