@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>VISABConnector.Unity</RootNamespace>
     <AssemblyName>VISABConnector.Unity</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\VISABConnector.Unity.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -41,13 +43,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ImageExtractor.cs" />
+    <Compile Include="CameraConfiguration.cs" />
+    <Compile Include="CameraCreator.cs" />
+    <Compile Include="UnityExtensionMethods.cs" />
+    <Compile Include="ImageCreator.cs" />
+    <Compile Include="InstantiationConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SnapshotConfiguration.cs" />
+    <Compile Include="SnapshotMethods.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Unity3D.SDK">
-      <Version>2021.1.12.1</Version>
+      <Version>2021.1.14.1</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>python F:\Projekte\GitHub\vscode_macro\copy_assemblies.py</PostBuildEvent>
+  </PropertyGroup>
 </Project>

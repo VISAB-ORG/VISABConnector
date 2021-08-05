@@ -46,7 +46,7 @@ namespace VISABConnector
         /// </summary>
         /// <param name="image">The image object of type T</param>
         /// <returns>An ApiResponse object</returns>
-        Task<ApiResponse<string>> SendImage(IImage image);
+        Task<ApiResponse<string>> SendImage(IImageContainer image);
 
         /// <summary>
         /// Sends a statistics object to the VISAB WebApi.

@@ -70,7 +70,7 @@ namespace VISABConnector
         /// </summary>
         /// <param name="image">The image to send</param>
         /// <returns>True if successfully sent</returns>
-        public static async Task<bool> SendImagesAsync(IImage image)
+        public static async Task<bool> SendImagesAsync(IImageContainer image)
         {
             if (Session == null || !Session.IsActive)
             {
