@@ -47,7 +47,7 @@ namespace VISABConnector
             // Close the VISAB api session
             WriteLog($"Closing session with VISAB WebApi.\nSessionId: {Session.SessionId}");
 
-            var response = await Session.CloseSession().ConfigureAwait(false);
+            var response = await Session.CloseSessionAsync().ConfigureAwait(false);
             if (response.IsSuccess)
                 WriteLog("Closed session at VISAB WebApi.");
             else
@@ -69,7 +69,7 @@ namespace VISABConnector
             }
 
             WriteLog("Making request to receive file from VISAB WebApi.");
-            var response = await Session.GetCreatedFile().ConfigureAwait(false);
+            var response = await Session.GetCreatedFileAsync().ConfigureAwait(false);
             if (response.IsSuccess)
             {
                 WriteLog($"Received file from VISAB WebApi.\n{response.Content}");
@@ -96,7 +96,7 @@ namespace VISABConnector
                 return false;
             }
 
-            var response = await Session.SendImage(image).ConfigureAwait(false);
+            var response = await Session.SendImagesAsync(image).ConfigureAwait(false);
             if (response.IsSuccess)
                 WriteLog($"Send images to VISAB!");
             else
@@ -120,7 +120,7 @@ namespace VISABConnector
 
             WriteLog("Starting to initalize Session with VISAB WebApi.");
             // Initializes the VISAB transmission session
-            var response = await visabApi.InitiateSession(metaInformation).ConfigureAwait(false);
+            var response = await visabApi.InitiateSessionAsync(metaInformation).ConfigureAwait(false);
             if (response.IsSuccess)
             {
                 Session = response.Content;
@@ -223,7 +223,7 @@ namespace VISABConnector
                 return false;
             }
 
-            var response = await Session.SendStatistics(statistics).ConfigureAwait(false);
+            var response = await Session.SendStatisticsAsync(statistics).ConfigureAwait(false);
             if (response.IsSuccess)
                 WriteLog($"Send statistics to VISAB!");
             else

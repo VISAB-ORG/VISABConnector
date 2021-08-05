@@ -99,7 +99,7 @@ namespace VISABConnector
         /// </summary>
         /// <param name="game">The game to check</param>
         /// <returns>An ApiResponse object with Content set to true if game is supported</returns>
-        public async Task<ApiResponse<bool>> GameIsSupported(string game)
+        public async Task<ApiResponse<bool>> GameIsSupportedAsync(string game)
         {
             var response = await SessionIndependantRequestHandler.GetDeserializedResponseAsync<List<string>>(HttpMethod.Get, _endpointGameSupported, null, null)
                                                                  .ConfigureAwait(false);
@@ -126,7 +126,7 @@ namespace VISABConnector
         /// An ApiResponse object whose content contains a list of the sessionIds for all active
         /// sessions if successful
         /// </returns>
-        public async Task<ApiResponse<IList<Guid>>> GetActiveSessions()
+        public async Task<ApiResponse<IList<Guid>>> GetActiveSessionsAsync()
         {
             return await SessionIndependantRequestHandler.GetDeserializedResponseAsync<IList<Guid>>(HttpMethod.Get, _endpointListSessions, null, null).ConfigureAwait(false);
         }
@@ -148,12 +148,12 @@ namespace VISABConnector
         /// </summary>
         /// <param name="metaInformation">The meta information for the session to open</param>
         /// <returns>An ApiResponse object containing a IVISABSession if session was created</returns>
-        public async Task<ApiResponse<IVISABSession>> InitiateSession(IMetaInformation metaInformation)
+        public async Task<ApiResponse<IVISABSession>> InitiateSessionAsync(IMetaInformation metaInformation)
         {
             if (metaInformation == null)
                 throw new ArgumentNullException(nameof(metaInformation));
 
-            var pingResponse = await IsApiReachable().ConfigureAwait(false);
+            var pingResponse = await PingApiAsync().ConfigureAwait(false);
             if (!pingResponse.IsSuccess)
             {
                 return new ApiResponse<IVISABSession>
@@ -163,7 +163,7 @@ namespace VISABConnector
                 };
             }
 
-            var gameSupportedResponse = await GameIsSupported(metaInformation.Game).ConfigureAwait(false);
+            var gameSupportedResponse = await GameIsSupportedAsync(metaInformation.Game).ConfigureAwait(false);
             if (gameSupportedResponse.IsSuccess && !gameSupportedResponse.Content)
             {
                 throw new ArgumentException($"Game {metaInformation.Game} is not supported by the VISAB WebApi!");
@@ -212,7 +212,7 @@ namespace VISABConnector
         /// <returns>
         /// An ApiResponse object whose content contains the response message if request was successful
         /// </returns>
-        public async Task<ApiResponse<string>> IsApiReachable()
+        public async Task<ApiResponse<string>> PingApiAsync()
         {
             return await SessionIndependantRequestHandler.GetResponseAsync(HttpMethod.Get, _endpointPing, null, null).ConfigureAwait(false);
         }
