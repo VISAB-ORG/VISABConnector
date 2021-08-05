@@ -56,7 +56,7 @@
     <Compile Include="Http\VISABRequestHandler.cs" />
     <Compile Include="Serialization\IgnorePropertyContractResolver.cs" />
     <Compile Include="Interface\IMetaInformation.cs" />
-    <Compile Include="Interface\IVISABStatistics.cs" />
+    <Compile Include="Interface\IStatistics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VISABApi.cs" />
     <Compile Include="VISABSession.cs" />

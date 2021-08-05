@@ -84,7 +84,7 @@ namespace VISABConnector
             return response;
         }
 
-        public async Task<ApiResponse<string>> SendStatistics(IVISABStatistics statistics)
+        public async Task<ApiResponse<string>> SendStatistics(IStatistics statistics)
         {
             var response = await RequestHandler.GetResponseAsync(HttpMethod.Post, _endpointSendStatistics, statistics, null).ConfigureAwait(false);
             if (!response.IsSuccess && response.ErrorMessage.Contains(_sessionAlreadyClosedResponse))

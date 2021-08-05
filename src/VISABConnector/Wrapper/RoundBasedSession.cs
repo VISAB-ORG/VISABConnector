@@ -92,7 +92,7 @@ namespace VISABConnector
         /// </summary>
         /// <param name="statistics">The statistics to send</param>
         /// <returns>True if successfully sent</returns>
-        public static async Task<bool> SendStatisticsAsync(IVISABStatistics statistics)
+        public static async Task<bool> SendStatisticsAsync(IStatistics statistics)
         {
             if (Session == null || !Session.IsActive)
             {

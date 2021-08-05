@@ -167,7 +167,7 @@ namespace VISABConnector
         /// Whether to break out of the loop if sending statistics fails
         /// </param>
         /// <param name="queryFile">Whether to query the created file after the session was closed</param>
-        public static async void StartStatisticsLoopAsync(Func<IVISABStatistics> statisticsFunc, Func<bool> shouldSend, int sentDelay, CancellationToken cancellationToken, bool breakOnFailed = true, bool queryFile = false)
+        public static async void StartStatisticsLoopAsync(Func<IStatistics> statisticsFunc, Func<bool> shouldSend, int sentDelay, CancellationToken cancellationToken, bool breakOnFailed = true, bool queryFile = false)
         {
             try
             {
@@ -215,7 +215,7 @@ namespace VISABConnector
         /// </summary>
         /// <param name="statistics">The statistics to send</param>
         /// <returns>True if successfully sent</returns>
-        private static async Task<bool> SendStatisticsAsync(IVISABStatistics statistics)
+        private static async Task<bool> SendStatisticsAsync(IStatistics statistics)
         {
             if (Session == null || !Session.IsActive)
             {

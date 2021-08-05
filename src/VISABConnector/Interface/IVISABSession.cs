@@ -53,6 +53,6 @@ namespace VISABConnector
         /// </summary>
         /// <param name="statistics">The statistics object of type T</param>
         /// <returns>An ApiResponse object</returns>
-        Task<ApiResponse<string>> SendStatistics(IVISABStatistics statistics);
+        Task<ApiResponse<string>> SendStatistics(IStatistics statistics);
     }
 }
