@@ -52,6 +52,7 @@
     <Compile Include="Tetris\DefaultExample.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tetris\RoundBasedExample.cs" />
+    <Compile Include="Tetris\TetrisBoard.cs" />
     <Compile Include="Tetris\TetrisImages.cs" />
     <Compile Include="Tetris\TetrisMetaInformation.cs" />
     <Compile Include="Tetris\TetrisStatistics.cs" />

@@ -51,5 +51,10 @@ namespace VISABConnector.Example.Tetris
             if (!response.IsSuccess)
                 Debug.Log(response.ErrorMessage);
         }
+
+        private void IncrementPlayerPoints(Player player)
+        {
+            player.Score += player.Board.CalculateScore();
+        }
     }
 }
