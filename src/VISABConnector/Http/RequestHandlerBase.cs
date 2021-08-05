@@ -79,7 +79,7 @@ namespace VISABConnector.Http
             foreach (var pair in queryParameters)
                 parametrizedUrl += $"{pair.Key}={pair.Value}&";
 
-            return relativeUrl.Substring(0, relativeUrl.Length - 1);
+            return parametrizedUrl;
         }
 
         /// <summary>
