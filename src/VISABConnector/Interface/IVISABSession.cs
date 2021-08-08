@@ -32,27 +32,27 @@ namespace VISABConnector
         /// Closes the session at the VISAB WebApi.
         /// </summary>
         /// <returns>An ApiResponse object</returns>
-        Task<ApiResponse<string>> CloseSession();
+        Task<ApiResponse<string>> CloseSessionAsync();
 
         /// <summary>
         /// Queries the file that was created by VISAB for the session. Only works if the session
         /// was closed before.
         /// </summary>
         /// <returns>An ApiResponse object with the file as a json string in the content</returns>
-        Task<ApiResponse<string>> GetCreatedFile();
+        Task<ApiResponse<string>> GetCreatedFileAsync();
 
         /// <summary>
         /// Sends a image object to the VISAB WebApi.
         /// </summary>
         /// <param name="image">The image object of type T</param>
         /// <returns>An ApiResponse object</returns>
-        Task<ApiResponse<string>> SendImage(IImageContainer image);
+        Task<ApiResponse<string>> SendImagesAsync(IImageContainer image);
 
         /// <summary>
         /// Sends a statistics object to the VISAB WebApi.
         /// </summary>
         /// <param name="statistics">The statistics object of type T</param>
         /// <returns>An ApiResponse object</returns>
-        Task<ApiResponse<string>> SendStatistics(IVISABStatistics statistics);
+        Task<ApiResponse<string>> SendStatisticsAsync(IStatistics statistics);
     }
 }
