@@ -9,8 +9,6 @@ namespace VISABConnector.Unity
         /// </summary>
         public const string CameraName = "VISABConnector.Unity Camera";
 
-        public static readonly Vector3 DefaultRotation = new Vector3(90, 0, 0);
-
         public static Camera CreateCamera()
         {
             var existing = GameObject.Find(CameraName);
@@ -27,7 +25,6 @@ namespace VISABConnector.Unity
 
         private static void ConfigureCamera(Camera camera)
         {
-            camera.transform.Rotate(DefaultRotation);
         }
     }
 }

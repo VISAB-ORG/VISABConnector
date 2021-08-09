@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VISABConnector", "VISABConn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VISABConnector.Unity", "VISABConnector.Unity\VISABConnector.Unity.csproj", "{FDAE79C6-8151-49FA-9225-3B3595024775}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VISABConnector.Example", "VISABConnector.Example\VISABConnector.Example.csproj", "{37FA7020-DB04-4E65-BF9E-E4167529AE8E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{FDAE79C6-8151-49FA-9225-3B3595024775}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDAE79C6-8151-49FA-9225-3B3595024775}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDAE79C6-8151-49FA-9225-3B3595024775}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37FA7020-DB04-4E65-BF9E-E4167529AE8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37FA7020-DB04-4E65-BF9E-E4167529AE8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37FA7020-DB04-4E65-BF9E-E4167529AE8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37FA7020-DB04-4E65-BF9E-E4167529AE8E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
