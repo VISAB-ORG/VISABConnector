@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace VISABConnector.Unity
 {
@@ -9,5 +10,7 @@ namespace VISABConnector.Unity
         public Quaternion SpawnRotation { get; set; }
 
         public string PrefabPath { get; set; }
+
+        public Action<GameObject> AfterInstantiation { get; set; }
     }
 }
