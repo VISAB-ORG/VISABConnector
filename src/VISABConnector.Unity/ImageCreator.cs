@@ -128,6 +128,8 @@ namespace VISABConnector.Unity
 
             gameObject.SetActive(true);
 
+            config.AfterInstantiation?.Invoke(gameObject);
+
             return gameObject;
         }
 
