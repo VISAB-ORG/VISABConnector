@@ -4,15 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FDAE79C6-8151-49FA-9225-3B3595024775}</ProjectGuid>
+    <ProjectGuid>{37FA7020-DB04-4E65-BF9E-E4167529AE8E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VISABConnector.Unity</RootNamespace>
-    <AssemblyName>VISABConnector.Unity</AssemblyName>
+    <RootNamespace>VISABConnector.Example</RootNamespace>
+    <AssemblyName>VISABConnector.Example</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,7 +21,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\VISABConnector.Unity.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,15 +42,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CameraConfiguration.cs" />
-    <Compile Include="CameraCreator.cs" />
-    <Compile Include="ChildConfiguration.cs" />
-    <Compile Include="UnityExtensionMethods.cs" />
-    <Compile Include="ImageCreator.cs" />
-    <Compile Include="InstantiationConfiguration.cs" />
+    <Compile Include="Shooter\LoopBasedExample.cs" />
+    <Compile Include="ReciveFileExample.cs" />
+    <Compile Include="Shooter\Player.cs" />
+    <Compile Include="Shooter\ShooterImages.cs" />
+    <Compile Include="Shooter\ShooterMetaInformation.cs" />
+    <Compile Include="Shooter\ShooterStatistics.cs" />
+    <Compile Include="Tetris\Player.cs" />
+    <Compile Include="Tetris\DefaultExample.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SnapshotConfiguration.cs" />
-    <Compile Include="SnapshotMethods.cs" />
+    <Compile Include="Tetris\RoundBasedExample.cs" />
+    <Compile Include="Tetris\TetrisBoard.cs" />
+    <Compile Include="Tetris\TetrisImages.cs" />
+    <Compile Include="Tetris\TetrisMetaInformation.cs" />
+    <Compile Include="Tetris\TetrisStatistics.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VISABConnector.Unity\VISABConnector.Unity.csproj">
+      <Project>{fdae79c6-8151-49fa-9225-3b3595024775}</Project>
+      <Name>VISABConnector.Unity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VISABConnector\VISABConnector.csproj">
+      <Project>{d0997f18-fdbe-4d87-b3f2-23dbce0f1959}</Project>
+      <Name>VISABConnector</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Unity3D.SDK">
@@ -59,7 +73,4 @@
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>python F:\Projekte\GitHub\vscode_macro\copy_assemblies.py</PostBuildEvent>
-  </PropertyGroup>
 </Project>

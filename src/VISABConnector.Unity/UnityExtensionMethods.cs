@@ -23,15 +23,14 @@ namespace VISABConnector.Unity
             return bounds;
         }
 
-        public static void FocusOnAbsolute(this Camera cam, GameObject obj, float absoluteYOffset, Vector3 rotationAngle)
+        public static void FocusOnAbsolute(this Camera cam, GameObject obj, float absoluteYOffset,
+            Vector3 rotationAngle)
         {
             Bounds bounds = obj.GetBoundsWithChildren();
             float maxExtent = bounds.extents.magnitude;
             cam.transform.position = bounds.center + Vector3.up * absoluteYOffset;
 
-            cam.transform.rotation = Quaternion.identity;
-            cam.transform.Rotate(CameraCreator.DefaultRotation);
-            cam.transform.Rotate(rotationAngle.x, rotationAngle.y, rotationAngle.z, Space.Self);
+            cam.transform.rotation = Quaternion.Euler(rotationAngle);
 
             Debug.Log("GameObj: " + obj + ", coordinates: " + obj.transform.position);
             Debug.Log("Camera: " + cam + ", coordinates: " + cam.transform.position);
@@ -39,16 +38,15 @@ namespace VISABConnector.Unity
             Debug.Log(bounds);
         }
 
-        public static void FocusOn(this Camera cam, GameObject focusedObject, float marginPercentage, Vector3 rotationAngle)
+        public static void FocusOn(this Camera cam, GameObject focusedObject, float marginPercentage,
+            Vector3 rotationAngle)
         {
             Bounds bounds = focusedObject.GetBoundsWithChildren();
             float maxExtent = bounds.extents.magnitude;
             float minDistance = (maxExtent * marginPercentage) / Mathf.Sin(Mathf.Deg2Rad * cam.fieldOfView / 0.5f);
             cam.transform.position = bounds.center + Vector3.up * minDistance;
-            
-            cam.transform.rotation = Quaternion.identity;
-            cam.transform.Rotate(CameraCreator.DefaultRotation);
-            cam.transform.Rotate(rotationAngle.x, rotationAngle.y, rotationAngle.z, Space.Self);
+
+            cam.transform.rotation = Quaternion.Euler(rotationAngle);
 
             Debug.Log("GameObj: " + focusedObject + ", coordinates: " + focusedObject.transform.position);
             Debug.Log("Camera: " + cam + ", coordinates: " + cam.transform.position);
