@@ -9,6 +9,9 @@ namespace VISABConnector.Unity
 
         public CameraConfiguration CameraConfiguration { get; set; }
 
+        public ChildConfiguration ChildConfiguration { get; set; }
+
+
         /// <summary>
         /// TODO: Really not name? GameObject.Find has a parameter with name that is used by us
         /// </summary>
@@ -21,6 +24,8 @@ namespace VISABConnector.Unity
         public int ImageWidth { get; set; }
 
         public int ImageHeight { get; set; }
+
+        public bool HasChildComponents => ChildConfiguration != null;
 
         public bool ShouldInstantiate => InstantiationSettings != null;
     }

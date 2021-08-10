@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="CameraConfiguration.cs" />
     <Compile Include="CameraCreator.cs" />
+    <Compile Include="ChildConfiguration.cs" />
     <Compile Include="UnityExtensionMethods.cs" />
     <Compile Include="ImageCreator.cs" />
     <Compile Include="InstantiationConfiguration.cs" />

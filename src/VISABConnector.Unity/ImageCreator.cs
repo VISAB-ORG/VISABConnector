@@ -38,19 +38,46 @@ namespace VISABConnector.Unity
             if (cameraConfig.Orthographic)
                 camera.orthographicSize = cameraConfig.OrthographicSize;
 
-            var gameObject = config.ShouldInstantiate ? InstantiateGameObject(config.InstantiationSettings) : GameObject.Find(config.GameObjectId);
-            if (!config.ShouldInstantiate && gameObject == null)
-                throw new Exception($"There is no GameObject with name {config.GameObjectId}!");
+            GameObject gameObject;
+
+            if (config.HasChildComponents)
+            {
+                
+                gameObject = InstantiateGameObject(config.InstantiationSettings).transform.Find(config.ChildConfiguration.ChildName).gameObject;
+            }
+            else
+            {
+                gameObject = config.ShouldInstantiate ? InstantiateGameObject(config.InstantiationSettings) : GameObject.Find(config.GameObjectId);
+                if (!config.ShouldInstantiate && gameObject == null)
+                    throw new Exception($"There is no GameObject with name {config.GameObjectId}!");
+            }
+
+            //gameObject = config.ShouldInstantiate ? InstantiateGameObject(config.InstantiationSettings) : GameObject.Find(config.GameObjectId);
+
+            //if (!config.ShouldInstantiate && gameObject == null)
+            //    throw new Exception($"There is no GameObject with name {config.GameObjectId}!");
+
 
             int oldLayer = gameObject.layer;
 
-            SetLayerRecursively(gameObject, LayerMask.NameToLayer(VISABLayerName));
+            if (config.HasChildComponents)
+            {
+                SetLayerRecursively(gameObject.transform.parent.gameObject, LayerMask.NameToLayer(VISABLayerName));
+            }
+            else
+            {
+                SetLayerRecursively(gameObject, LayerMask.NameToLayer(VISABLayerName));
+            }
+
+
             camera.cullingMask = 1 << LayerMask.NameToLayer(VISABLayerName);
-            //camera.backgroundColor = Color.clear;
+            camera.backgroundColor = Color.clear;
+            camera.clearFlags = CameraClearFlags.Depth;
 
             Debug.Log($"Offset: {cameraConfig.CameraOffset} is absolute? {cameraConfig.UseAbsoluteOffset}");
             if (cameraConfig.UseAbsoluteOffset)
-                camera.FocusOnAbsolute(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
+                camera.FocusOn(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
+                //camera.FocusOnAbsolute(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
             else
                 camera.FocusOn(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
 
@@ -76,7 +103,14 @@ namespace VISABConnector.Unity
             Debug.Log($"Took snapshot of {gameObject.name}");
 
             // Restore gameobject to previous state
-            SetLayerRecursively(gameObject, oldLayer);
+            if(config.HasChildComponents)
+            {
+                SetLayerRecursively(gameObject.transform.parent.gameObject, oldLayer);
+            }
+            else
+            {
+                SetLayerRecursively(gameObject, oldLayer);
+            }
 
             //if (config.ShouldInstantiate)
             //    GameObject.Destroy(gameObject);
