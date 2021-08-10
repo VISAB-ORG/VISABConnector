@@ -8,7 +8,7 @@ namespace VISABConnector.Unity
 
         public bool UseAbsoluteOffset { get; set; }
 
-        public Vector3 CameraRotation { get; set; } = new Vector3(90, 0, 0);
+        public Vector3 CameraRotation { get; set; }
 
         public bool Orthographic { get; set; }
 

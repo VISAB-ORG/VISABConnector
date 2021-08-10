@@ -7,7 +7,7 @@ namespace VISABConnector.Unity
     {
         public Vector3 SpawnLocation { get; set; }
 
-        public Quaternion SpawnRotation { get; set; }
+        public Vector3 SpawnRotation { get; set; }
 
         public string PrefabPath { get; set; }
 

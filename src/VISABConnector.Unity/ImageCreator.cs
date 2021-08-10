@@ -41,7 +41,7 @@ namespace VISABConnector.Unity
 
             if (config.HasChildComponents)
             {
-                
+
                 gameObject = InstantiateGameObject(config.InstantiationSettings).transform.Find(config.ChildConfiguration.ChildName).gameObject;
             }
             else
@@ -76,7 +76,7 @@ namespace VISABConnector.Unity
             Debug.Log($"Offset: {cameraConfig.CameraOffset} is absolute? {cameraConfig.UseAbsoluteOffset}");
             if (cameraConfig.UseAbsoluteOffset)
                 camera.FocusOn(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
-                //camera.FocusOnAbsolute(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
+            //camera.FocusOnAbsolute(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
             else
                 camera.FocusOn(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
 
@@ -87,7 +87,7 @@ namespace VISABConnector.Unity
             Debug.Log($"Took snapshot of {gameObject.name}");
 
             // Restore gameobject to previous state
-            if(config.HasChildComponents)
+            if (config.HasChildComponents)
             {
                 SetLayerRecursively(gameObject.transform.parent.gameObject, oldLayer);
             }
@@ -154,7 +154,7 @@ namespace VISABConnector.Unity
             if (resource == null)
                 throw new Exception($"Could not load prefab from path {config.PrefabPath}");
 
-            var gameObject = GameObject.Instantiate(resource, position: config.SpawnLocation, rotation: config.SpawnRotation) as GameObject;
+            var gameObject = GameObject.Instantiate(resource, position: config.SpawnLocation, rotation: Quaternion.Euler(config.SpawnRotation)) as GameObject;
             if (gameObject == null)
                 throw new Exception($"Could not instantiate GameObject!");
 
