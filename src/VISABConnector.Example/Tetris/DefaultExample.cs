@@ -56,5 +56,16 @@ namespace VISABConnector.Example.Tetris
         {
             player.Score += player.Board.CalculateScore();
         }
+        
+        private async void SwitchPlayer(Player current) 
+        {
+            // Determine the next player.
+        }
+
+    private async void OnGameEnded()
+    {
+        // Show a victory screen.
+    }
+    
     }
 }
