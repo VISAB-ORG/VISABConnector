@@ -31,52 +31,22 @@ namespace VISABConnector.Unity
             int width = config.ImageWidth > 0 ? config.ImageWidth : throw new ArgumentException("Image width was smaller than 0!");
             int height = config.ImageHeight > 0 ? config.ImageHeight : throw new ArgumentException("Image height was smaller than 0!");
 
-            var camera = CameraCreator.CreateCamera();
+            // create and set up camera
             var cameraConfig = config.CameraConfiguration;
-            camera.orthographic = cameraConfig.Orthographic;
-            if (cameraConfig.Orthographic)
-                camera.orthographicSize = cameraConfig.OrthographicSize;
+            var camera = CameraSetup(cameraConfig, VISABLayerName, CameraClearFlags.Depth);
 
-            GameObject gameObject;
+            // instantiate or grab game object
+            var gameObject = GameObjectSetup(config);
 
-            if (config.HasChildComponents)
-            {
-
-                gameObject = InstantiateGameObject(config.InstantiationSettings).transform.Find(config.ChildConfiguration.ChildName).gameObject;
-            }
-            else
-            {
-                gameObject = config.ShouldInstantiate ? InstantiateGameObject(config.InstantiationSettings) : GameObject.Find(config.GameObjectId);
-                if (!config.ShouldInstantiate && gameObject == null)
-                    throw new Exception($"There is no GameObject with name {config.GameObjectId}!");
-            }
-
-            //gameObject = config.ShouldInstantiate ? InstantiateGameObject(config.InstantiationSettings) : GameObject.Find(config.GameObjectId);
-
-            //if (!config.ShouldInstantiate && gameObject == null)
-            //    throw new Exception($"There is no GameObject with name {config.GameObjectId}!");
-
-
+            // preserve old layer before changing gameobjects to visab layer
             int oldLayer = gameObject.layer;
-
-            if (config.HasChildComponents)
-            {
-                SetLayerRecursively(gameObject.transform.parent.gameObject, LayerMask.NameToLayer(VISABLayerName));
-            }
-            else
-            {
-                SetLayerRecursively(gameObject, LayerMask.NameToLayer(VISABLayerName));
-            }
-
-
-            camera.cullingMask = 1 << LayerMask.NameToLayer(VISABLayerName);
-            camera.clearFlags = CameraClearFlags.Depth;
+            ChangeLayer(gameObject, config, LayerMask.NameToLayer(VISABLayerName));
 
             // Focus the camera
             Debug.Log($"Offset: {cameraConfig.CameraOffset} is absolute? {cameraConfig.UseAbsoluteOffset}");
+
             if (cameraConfig.UseAbsoluteOffset)
-                camera.FocusOn(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
-            //camera.FocusOnAbsolute(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
+                camera.FocusOnAbsolute(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
             else
                 camera.FocusOn(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
 
@@ -86,15 +56,8 @@ namespace VISABConnector.Unity
 
             Debug.Log($"Took snapshot of {gameObject.name}");
 
-            // Restore gameobject to previous state
-            if (config.HasChildComponents)
-            {
-                SetLayerRecursively(gameObject.transform.parent.gameObject, oldLayer);
-            }
-            else
-            {
-                SetLayerRecursively(gameObject, oldLayer);
-            }
+            // Restore gameobject's layers to previous state
+            ChangeLayer(gameObject, config, oldLayer);
 
             //if (config.ShouldInstantiate)
             //    GameObject.Destroy(gameObject);
@@ -166,7 +129,7 @@ namespace VISABConnector.Unity
         }
 
         /// <summary>
-        /// Assigns Layer to all children of gameobjects
+        /// Assigns Layer to all children of gameobject
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="layer"></param>
@@ -179,6 +142,68 @@ namespace VISABConnector.Unity
 
                 SetLayerRecursively(child.gameObject, layer);
             }
+        }
+
+        /// <summary>
+        /// Assigns layer to just child or parent (hence all children)
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="config"></param>
+        /// <param name="layer"></param>
+        public static void ChangeLayer(GameObject obj, SnapshotConfiguration config, int layer)
+        {
+            if (config.HasChildComponents && config.ChildConfiguration.SnapAllChilds)
+            {
+                SetLayerRecursively(obj.transform.parent.gameObject, layer);
+            }
+            else
+            {
+                SetLayerRecursively(obj, layer);
+            }
+        }
+
+        /// <summary>
+        /// Creates and sets up camera accordingly
+        /// </summary>
+        /// <param name="camConfig"></param>
+        /// <param name="cullingLayer"></param>
+        /// <param name="clearFlags"></param>
+        /// <returns></returns>
+        public static Camera CameraSetup(CameraConfiguration camConfig, String cullingLayer, CameraClearFlags clearFlags)
+        {
+            var cam = CameraCreator.CreateCamera();
+
+            cam.orthographic = camConfig.Orthographic;
+            cam.cullingMask = 1 << LayerMask.NameToLayer(cullingLayer);
+            cam.clearFlags = clearFlags;
+
+            if (camConfig.Orthographic)
+                cam.orthographicSize = camConfig.OrthographicSize;
+
+            return cam;
+        }
+
+        /// <summary>
+        /// Instantiates or grabs Game Object and/or its child object
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public static GameObject GameObjectSetup(SnapshotConfiguration config)
+        {
+            GameObject gameObject;
+
+            if (config.HasChildComponents)
+            {
+                gameObject = InstantiateGameObject(config.InstantiationSettings).transform.Find(config.ChildConfiguration.ChildName).gameObject;
+            }
+            else
+            {
+                gameObject = config.ShouldInstantiate ? InstantiateGameObject(config.InstantiationSettings) : GameObject.Find(config.GameObjectId);
+                if (!config.ShouldInstantiate && gameObject == null)
+                    throw new Exception($"There is no GameObject with name {config.GameObjectId}!");
+            }
+
+            return gameObject;
         }
     }
 }
