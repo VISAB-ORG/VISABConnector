@@ -9,6 +9,10 @@ namespace VISABConnector.Unity
         /// </summary>
         public const string CameraName = "VISABConnector.Unity Camera";
 
+        /// <summary>
+        /// Creates the camera that will be used for snapshotting the game objects
+        /// </summary>
+        /// <returns>Returns the created camera</returns>
         public static Camera CreateCamera()
         {
             var existing = GameObject.Find(CameraName);

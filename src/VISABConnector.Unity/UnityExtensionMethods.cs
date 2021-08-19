@@ -7,8 +7,16 @@ using UnityEngine;
 
 namespace VISABConnector.Unity
 {
+    /// <summary>
+    /// Extension methods that do the actual snapshotting work
+    /// </summary>
     public static class UnityExtensionMethods
     {
+        /// <summary>
+        /// Returns the bounds of the gameobject including all of its children
+        /// </summary>
+        /// <param name="gameObject">The gameobject that is supposed to be snapped</param>
+        /// <returns>The object's bounds</returns>
         public static Bounds GetBoundsWithChildren(this GameObject gameObject)
         {
             var renderers = gameObject.GetComponentsInChildren<Renderer>();
@@ -23,6 +31,13 @@ namespace VISABConnector.Unity
             return bounds;
         }
 
+        /// <summary>
+        /// Positions the camera exactly centered onto the according game object. But does not consider the object's bounds to determine the offset, rather the given parameter absoluteYOffset. 
+        /// </summary>
+        /// <param name="cam">The snapshot cam</param>
+        /// <param name="obj">The game object to be snapped</param>
+        /// <param name="absoluteYOffset">The distance between object and camera</param>
+        /// <param name="rotationAngle">The camera's rotation</param>
         public static void FocusOnAbsolute(this Camera cam, GameObject obj, float absoluteYOffset,
             Vector3 rotationAngle)
         {
@@ -38,6 +53,13 @@ namespace VISABConnector.Unity
             Debug.Log(bounds);
         }
 
+        /// <summary>
+        /// Positions the camera over the gamobject
+        /// </summary>
+        /// <param name="cam">The snapshot cam</param>
+        /// <param name="focusedObject">The game object to be snapped</param>
+        /// <param name="marginPercentage">Adjusts the distance between object and camera</param>
+        /// <param name="rotationAngle">The camera's rotation</param>
         public static void FocusOn(this Camera cam, GameObject focusedObject, float marginPercentage,
             Vector3 rotationAngle)
         {
@@ -55,6 +77,11 @@ namespace VISABConnector.Unity
             Debug.Log(bounds);
         }
 
+        /// <summary>
+        /// Test method that centers the camera over the gameobject and makes it look at it. For testing purposes only.
+        /// </summary>
+        /// <param name="cam"></param>
+        /// <param name="obj"></param>
         public static void CenterOn(this Camera cam, GameObject obj)
         {
             Bounds b = GetBoundsWithChildren(obj);
