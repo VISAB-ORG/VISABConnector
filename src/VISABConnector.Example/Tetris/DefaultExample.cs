@@ -84,7 +84,7 @@ namespace VISABConnector.Example.Tetris
                 images.OneOneOneOne = bytes;
             }
 
-            LoopBasedSession.SendImagesAsync(images).Wait();
+            session.SendImagesAsync(images).Wait();
 
         }
 
