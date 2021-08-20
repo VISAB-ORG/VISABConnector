@@ -22,7 +22,6 @@ namespace VISABConnector.Example.Tetris
                 throw new Exception();
 
             session = RoundBasedSession.Session;
-            // TODO: Add VISABConnector.Unity example
 
             var images = new TetrisImages();
 

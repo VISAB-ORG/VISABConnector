@@ -27,7 +27,6 @@ namespace VISABConnector.Example.Shooter
 
             session = LoopBasedSession.Session;
 
-            // TODO: Add VISABConnector.Unity example
             var images = new ShooterImages();
 
             var players = new Dictionary<string, string>

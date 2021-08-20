@@ -26,7 +26,6 @@ namespace VISABConnector.Example.Tetris
             else
                 throw new Exception(sessionResponse.ErrorMessage);
 
-            // TODO: Add VISABConnector.Unity example
             var images = new TetrisImages();
 
             var bricks = new Dictionary<string, string>
