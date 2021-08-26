@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace VISABConnector.Unity
 {
@@ -22,17 +17,16 @@ namespace VISABConnector.Unity
             var renderers = gameObject.GetComponentsInChildren<Renderer>();
 
             var bounds = renderers.Length > 0 ? renderers[0].bounds : new Bounds();
-            for (int i = 1; i < renderers.Length; i++)
-            {
+            for (var i = 1; i < renderers.Length; i++)
                 if (renderers[i].enabled)
                     bounds.Encapsulate(renderers[i].bounds);
-            }
 
             return bounds;
         }
 
         /// <summary>
-        /// Positions the camera exactly centered onto the according game object. But does not consider the object's bounds to determine the offset, rather the given parameter absoluteYOffset. 
+        /// Positions the camera exactly centered onto the according game object. But does not consider the object's bounds to
+        /// determine the offset, rather the given parameter absoluteYOffset.
         /// </summary>
         /// <param name="cam">The snapshot cam</param>
         /// <param name="obj">The game object to be snapped</param>
@@ -41,8 +35,8 @@ namespace VISABConnector.Unity
         public static void FocusOnAbsolute(this Camera cam, GameObject obj, float absoluteYOffset,
             Vector3 rotationAngle)
         {
-            Bounds bounds = obj.GetBoundsWithChildren();
-            float maxExtent = bounds.extents.magnitude;
+            var bounds = obj.GetBoundsWithChildren();
+            var maxExtent = bounds.extents.magnitude;
             cam.transform.position = bounds.center + Vector3.up * absoluteYOffset;
 
             cam.transform.rotation = Quaternion.Euler(rotationAngle);
@@ -63,9 +57,9 @@ namespace VISABConnector.Unity
         public static void FocusOn(this Camera cam, GameObject focusedObject, float marginPercentage,
             Vector3 rotationAngle)
         {
-            Bounds bounds = focusedObject.GetBoundsWithChildren();
-            float maxExtent = bounds.extents.magnitude;
-            float minDistance = (maxExtent * marginPercentage) / Mathf.Sin(Mathf.Deg2Rad * cam.fieldOfView / 0.5f);
+            var bounds = focusedObject.GetBoundsWithChildren();
+            var maxExtent = bounds.extents.magnitude;
+            var minDistance = maxExtent * marginPercentage / Mathf.Sin(Mathf.Deg2Rad * cam.fieldOfView / 0.5f);
             cam.transform.position = bounds.center + Vector3.up * minDistance;
 
             cam.transform.rotation = Quaternion.Euler(rotationAngle);
@@ -84,10 +78,10 @@ namespace VISABConnector.Unity
         /// <param name="obj"></param>
         public static void CenterOn(this Camera cam, GameObject obj)
         {
-            Bounds b = GetBoundsWithChildren(obj);
-            Vector3 v = obj.transform.position;
+            var b = GetBoundsWithChildren(obj);
+            var v = obj.transform.position;
 
-            cam.transform.position = v + (Vector3.up * 10);
+            cam.transform.position = v + Vector3.up * 10;
             Debug.Log(cam.transform.position);
             cam.transform.LookAt(obj.transform.position);
         }

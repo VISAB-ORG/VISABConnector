@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace VISABConnector.Unity
 {
@@ -26,13 +26,15 @@ namespace VISABConnector.Unity
                 throw new ArgumentNullException(nameof(config));
 
             if (LayerMask.NameToLayer(VISABLayerName) == -1)
-            {
-                throw new Exception($"ImageCreator uses Unity layers to take screenshots of single GameObjects. " +
+                throw new Exception("ImageCreator uses Unity layers to take screenshots of single GameObjects. " +
                                     $"Create a layer named {VISABLayerName} in the Unity Editor.");
-            }
 
-            int width = config.ImageWidth > 0 ? config.ImageWidth : throw new ArgumentException("Image width was smaller than 0!");
-            int height = config.ImageHeight > 0 ? config.ImageHeight : throw new ArgumentException("Image height was smaller than 0!");
+            var width = config.ImageWidth > 0
+                ? config.ImageWidth
+                : throw new ArgumentException("Image width was smaller than 0!");
+            var height = config.ImageHeight > 0
+                ? config.ImageHeight
+                : throw new ArgumentException("Image height was smaller than 0!");
 
             // create and set up camera
             var cameraConfig = config.CameraConfiguration;
@@ -42,7 +44,7 @@ namespace VISABConnector.Unity
             var gameObject = GameObjectSetup(config);
 
             // preserve old layer before changing gameobjects to visab layer
-            int oldLayer = gameObject.layer;
+            var oldLayer = gameObject.layer;
             ChangeLayer(gameObject, config, LayerMask.NameToLayer(VISABLayerName));
 
             // Focus the camera
@@ -69,7 +71,7 @@ namespace VISABConnector.Unity
 
             return imageBytes;
         }
-        
+
         // Creates a texture on which the game object's snapshot will be copied to
 
         private static Texture2D MakeTexture(Camera camera, int width, int height)
@@ -96,7 +98,8 @@ namespace VISABConnector.Unity
         /// </summary>
         /// <param name="configs">The config objects you will need for the snapshots</param>
         /// <returns>A dictionary which contains the byte arrays with their respective configuration objects</returns>
-        public static IDictionary<SnapshotConfiguration, byte[]> TakeSnapshots(IEnumerable<SnapshotConfiguration> configs)
+        public static IDictionary<SnapshotConfiguration, byte[]> TakeSnapshots(
+            IEnumerable<SnapshotConfiguration> configs)
         {
             var snapshots = new Dictionary<SnapshotConfiguration, byte[]>();
             foreach (var config in configs)
@@ -122,9 +125,11 @@ namespace VISABConnector.Unity
             if (resource == null)
                 throw new Exception($"Could not load prefab from path {config.PrefabPath}");
 
-            var gameObject = GameObject.Instantiate(resource, position: config.SpawnLocation, rotation: Quaternion.Euler(config.SpawnRotation)) as GameObject;
+            var gameObject =
+                Object.Instantiate(resource, config.SpawnLocation,
+                    Quaternion.Euler(config.SpawnRotation)) as GameObject;
             if (gameObject == null)
-                throw new Exception($"Could not instantiate GameObject!");
+                throw new Exception("Could not instantiate GameObject!");
 
             gameObject.SetActive(true);
 
@@ -155,19 +160,16 @@ namespace VISABConnector.Unity
         private static void ChangeLayer(GameObject obj, SnapshotConfiguration config, int layer)
         {
             if (config.HasChildComponents && config.ChildConfiguration.SnapAllChilds)
-            {
                 SetLayerRecursively(obj.transform.parent.gameObject, layer);
-            }
             else
-            {
                 SetLayerRecursively(obj, layer);
-            }
         }
 
 
         // Creates and sets up camera accordingly
 
-        private static Camera CameraSetup(CameraConfiguration camConfig, String cullingLayer, CameraClearFlags clearFlags)
+        private static Camera CameraSetup(CameraConfiguration camConfig, string cullingLayer,
+            CameraClearFlags clearFlags)
         {
             var cam = CameraCreator.CreateCamera();
 
@@ -190,11 +192,14 @@ namespace VISABConnector.Unity
 
             if (config.HasChildComponents)
             {
-                gameObject = InstantiateGameObject(config.InstantiationSettings).transform.Find(config.ChildConfiguration.ChildName).gameObject;
+                gameObject = InstantiateGameObject(config.InstantiationSettings).transform
+                    .Find(config.ChildConfiguration.ChildName).gameObject;
             }
             else
             {
-                gameObject = config.ShouldInstantiate ? InstantiateGameObject(config.InstantiationSettings) : GameObject.Find(config.GameObjectId);
+                gameObject = config.ShouldInstantiate
+                    ? InstantiateGameObject(config.InstantiationSettings)
+                    : GameObject.Find(config.GameObjectId);
                 if (!config.ShouldInstantiate && gameObject == null)
                     throw new Exception($"There is no GameObject with name {config.GameObjectId}!");
             }

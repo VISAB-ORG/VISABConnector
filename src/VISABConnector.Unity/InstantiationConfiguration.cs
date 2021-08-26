@@ -4,7 +4,7 @@ using UnityEngine;
 namespace VISABConnector.Unity
 {
     /// <summary>
-    /// Contains the configuration settings for gameobjects that need to be instantiated before being snapshotted 
+    /// Contains the configuration settings for gameobjects that need to be instantiated before being snapshotted
     /// </summary>
     public class InstantiationConfiguration
     {
@@ -23,6 +23,9 @@ namespace VISABConnector.Unity
         /// </summary>
         public string PrefabPath { get; set; }
 
+        /// <summary>
+        /// Actions that will be invoked after after the gameobject was successfully instantiated.
+        /// </summary>
         public Action<GameObject> AfterInstantiation { get; set; }
     }
 }

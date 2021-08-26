@@ -1,7 +1,4 @@
-﻿using System;
-using UnityEngine;
-
-namespace VISABConnector.Unity
+﻿namespace VISABConnector.Unity
 {
     /// <summary>
     /// Configuration class that contains the relevant properties for snapshotting a gameobject
@@ -19,17 +16,10 @@ namespace VISABConnector.Unity
         public CameraConfiguration CameraConfiguration { get; set; }
 
         /// <summary>
-        /// Contains several settings that apply for game objects that contain multiple child objects (and you only want to snapshot a certain child)
+        /// Contains several settings that apply for game objects that contain multiple child objects (and you only want to
+        /// snapshot a certain child)
         /// </summary>
         public ChildConfiguration ChildConfiguration { get; set; }
-
-
-        /// <summary>
-        ///
-        /// </summary>
-        public SnapshotConfiguration()
-        {
-        }
 
         /// <summary>
         /// If gameobject does not need to be instantiated, this property contains its name tag

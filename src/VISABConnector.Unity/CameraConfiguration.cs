@@ -3,7 +3,7 @@
 namespace VISABConnector.Unity
 {
     /// <summary>
-    /// Class that unites the settings for the snapshot camera 
+    /// Class that unites the settings for the snapshot camera
     /// </summary>
     public class CameraConfiguration
     {
@@ -28,7 +28,7 @@ namespace VISABConnector.Unity
         public bool Orthographic { get; set; }
 
         /// <summary>
-        /// In case 'orthographic' is true, one may need to adjust the camera's panel size 
+        /// In case 'orthographic' is true, one may need to adjust the camera's panel size
         /// </summary>
         public float OrthographicSize { get; set; } = 1;
     }
