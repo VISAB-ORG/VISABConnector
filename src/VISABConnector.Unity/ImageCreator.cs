@@ -48,8 +48,6 @@ namespace VISABConnector.Unity
             ChangeLayer(gameObject, config, LayerMask.NameToLayer(VISABLayerName));
 
             // Focus the camera
-            Debug.Log($"Offset: {cameraConfig.CameraOffset} is absolute? {cameraConfig.UseAbsoluteOffset}");
-
             if (cameraConfig.UseAbsoluteOffset)
                 camera.FocusOnAbsolute(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
             else
@@ -64,16 +62,19 @@ namespace VISABConnector.Unity
             // Restore gameobject's layers to previous state
             ChangeLayer(gameObject, config, oldLayer);
 
-            //if (config.ShouldInstantiate)
-            //    GameObject.Destroy(gameObject);
-
-            // TODO: Deactivate camera?
+            if (config.ShouldInstantiate)
+                GameObject.Destroy(gameObject);
 
             return imageBytes;
         }
 
-        // Creates a texture on which the game object's snapshot will be copied to
-
+        /// <summary>
+        /// Creates a texture on which the game object's snapshot will be copied to
+        /// </summary>
+        /// <param name="camera"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
         private static Texture2D MakeTexture(Camera camera, int width, int height)
         {
             camera.targetTexture = RenderTexture.GetTemporary(width, height, 32);
@@ -155,8 +156,12 @@ namespace VISABConnector.Unity
         }
 
 
-        // Assigns layer to just child or parent (hence all children)
-
+        /// <summary>
+        /// Assigns layer to just child or parent (hence all children)
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="config"></param>
+        /// <param name="layer"></param>
         private static void ChangeLayer(GameObject obj, SnapshotConfiguration config, int layer)
         {
             if (config.HasChildComponents && config.ChildConfiguration.SnapAllChilds)
@@ -165,9 +170,13 @@ namespace VISABConnector.Unity
                 SetLayerRecursively(obj, layer);
         }
 
-
-        // Creates and sets up camera accordingly
-
+        /// <summary>
+        /// Creates and sets up camera accordingly
+        /// </summary>
+        /// <param name="camConfig"></param>
+        /// <param name="cullingLayer"></param>
+        /// <param name="clearFlags"></param>
+        /// <returns></returns>
         private static Camera CameraSetup(CameraConfiguration camConfig, string cullingLayer,
             CameraClearFlags clearFlags)
         {
@@ -183,9 +192,11 @@ namespace VISABConnector.Unity
             return cam;
         }
 
-
-        // Instantiates or grabs Game Object and/or its child object
-
+        /// <summary>
+        /// Instantiates or grabs Game Object and/or its child object
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
         private static GameObject GameObjectSetup(SnapshotConfiguration config)
         {
             GameObject gameObject;
