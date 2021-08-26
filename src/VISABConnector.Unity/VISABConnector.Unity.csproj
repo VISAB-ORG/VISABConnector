@@ -31,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\VISABConnector.Unity.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -45,12 +46,12 @@
   <ItemGroup>
     <Compile Include="CameraConfiguration.cs" />
     <Compile Include="CameraCreator.cs" />
+    <Compile Include="ChildConfiguration.cs" />
     <Compile Include="UnityExtensionMethods.cs" />
     <Compile Include="ImageCreator.cs" />
     <Compile Include="InstantiationConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SnapshotConfiguration.cs" />
-    <Compile Include="SnapshotMethods.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Unity3D.SDK">
@@ -59,6 +60,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>python F:\Projekte\GitHub\vscode_macro\copy_assemblies.py</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
