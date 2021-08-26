@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using VISABConnector.Unity;
 
 namespace VISABConnector.Example.Shooter
 {
@@ -26,7 +27,64 @@ namespace VISABConnector.Example.Shooter
 
             session = LoopBasedSession.Session;
 
-            // TODO: Add VISABConnector.Unity example
+            var images = new ShooterImages();
+
+            var players = new Dictionary<string, string>
+            {
+                { "Fast Player", "Prefabs/fast_character" },
+                { "Strong Player", "Prefabs/strong_character" },
+            };
+
+            var MapConfig = new SnapshotConfiguration
+            {
+                ImageHeight = 550,
+                ImageWidth = 550,
+                InstantiationSettings = new InstantiationConfiguration
+                {
+                    PrefabPath = "Prefabs/Map",
+                    SpawnLocation = new Vector3(500, 500, 500)
+                },
+                CameraConfiguration = new CameraConfiguration
+                {
+                    CameraOffset = 2f,
+                    Orthographic = true,
+                    CameraRotation = new Vector3(90, 0, 45),
+                    OrthographicSize = 75f
+                }
+            };
+
+            var map = ImageCreator.TakeSnapshot(MapConfig);
+
+            images.Map = map;
+
+            Func<string, SnapshotConfiguration> defaultInstantiate = (prefabPath) => new SnapshotConfiguration
+            {
+                ImageHeight = 1024,
+                ImageWidth = 1024,
+                InstantiationSettings = new InstantiationConfiguration
+                {
+                    PrefabPath = prefabPath,
+                    SpawnLocation = new Vector3(100, 100, 100),
+                },
+                CameraConfiguration = new CameraConfiguration
+                {
+                    CameraOffset = 1.5f,
+                    Orthographic = false,
+                    UseAbsoluteOffset = false,
+                    CameraRotation = new Vector3(90, 0, 0)
+                }
+            };
+
+            foreach (var pair in players)
+            {
+                var config = defaultInstantiate(pair.Value);
+                var bytes = ImageCreator.TakeSnapshot(config);
+
+                images.PlayerAvatars.Add(pair.Key, bytes);
+            }
+
+            LoopBasedSession.SendImagesAsync(images).Wait();
+
 
             cts = new CancellationTokenSource();
             Func<bool> shouldSend = () => isGamePaused;

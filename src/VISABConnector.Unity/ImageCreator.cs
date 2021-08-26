@@ -6,17 +6,20 @@ using UnityEngine;
 namespace VISABConnector.Unity
 {
     /// <summary>
-    /// TODO: Smart Instantiate
+    /// Class that unifies the methods in order to be able to snapshot any game item out of unity
     /// </summary>
     public static class ImageCreator
     {
+        /// <summary>
+        /// The VISAB layer variable which is assigned to every game object that will be snapshotted
+        /// </summary>
         public const string VISABLayerName = "VISAB";
 
         /// <summary>
-        /// TODO: A bunch of dumb arguments checking TODO: You may also pass an existing camera.
+        /// The actual method that conducts the snapshotting of game objects. It is calibrated by passing a config object to it
         /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
+        /// <param name="config">The config object that handles the specific requirements for snapping certain game objects</param>
+        /// <returns>A byte array which can be converted to a PNG-file or inserted into a JSON-File</returns>
         public static byte[] TakeSnapshot(SnapshotConfiguration config)
         {
             if (config == null)
@@ -31,25 +34,20 @@ namespace VISABConnector.Unity
             int width = config.ImageWidth > 0 ? config.ImageWidth : throw new ArgumentException("Image width was smaller than 0!");
             int height = config.ImageHeight > 0 ? config.ImageHeight : throw new ArgumentException("Image height was smaller than 0!");
 
-            var camera = CameraCreator.CreateCamera();
+            // create and set up camera
             var cameraConfig = config.CameraConfiguration;
-            camera.orthographic = cameraConfig.Orthographic;
-            if (cameraConfig.Orthographic)
-                camera.orthographicSize = cameraConfig.OrthographicSize;
+            var camera = CameraSetup(cameraConfig, VISABLayerName, CameraClearFlags.Depth);
 
-            var gameObject = config.ShouldInstantiate ? InstantiateGameObject(config.InstantiationSettings) : GameObject.Find(config.GameObjectId);
-            if (!config.ShouldInstantiate && gameObject == null)
-                throw new Exception($"There is no GameObject with name {config.GameObjectId}!");
+            // instantiate or grab game object
+            var gameObject = GameObjectSetup(config);
 
+            // preserve old layer before changing gameobjects to visab layer
             int oldLayer = gameObject.layer;
-
-            // Set up camera for taking screenshot
-            SetLayerRecursively(gameObject, LayerMask.NameToLayer(VISABLayerName));
-            camera.cullingMask = 1 << LayerMask.NameToLayer(VISABLayerName);
-            camera.clearFlags = CameraClearFlags.Depth;
+            ChangeLayer(gameObject, config, LayerMask.NameToLayer(VISABLayerName));
 
             // Focus the camera
             Debug.Log($"Offset: {cameraConfig.CameraOffset} is absolute? {cameraConfig.UseAbsoluteOffset}");
+
             if (cameraConfig.UseAbsoluteOffset)
                 camera.FocusOnAbsolute(gameObject, cameraConfig.CameraOffset, cameraConfig.CameraRotation);
             else
@@ -61,8 +59,8 @@ namespace VISABConnector.Unity
 
             Debug.Log($"Took snapshot of {gameObject.name}");
 
-            // Restore gameobject to previous state
-            SetLayerRecursively(gameObject, oldLayer);
+            // Restore gameobject's layers to previous state
+            ChangeLayer(gameObject, config, oldLayer);
 
             //if (config.ShouldInstantiate)
             //    GameObject.Destroy(gameObject);
@@ -71,6 +69,8 @@ namespace VISABConnector.Unity
 
             return imageBytes;
         }
+        
+        // Creates a texture on which the game object's snapshot will be copied to
 
         private static Texture2D MakeTexture(Camera camera, int width, int height)
         {
@@ -92,10 +92,10 @@ namespace VISABConnector.Unity
         }
 
         /// <summary>
-        /// TODO: You may also pass an existing camera.
+        /// Conduct several snapshots at once
         /// </summary>
-        /// <param name="configs"></param>
-        /// <returns></returns>
+        /// <param name="configs">The config objects you will need for the snapshots</param>
+        /// <returns>A dictionary which contains the byte arrays with their respective configuration objects</returns>
         public static IDictionary<SnapshotConfiguration, byte[]> TakeSnapshots(IEnumerable<SnapshotConfiguration> configs)
         {
             var snapshots = new Dictionary<SnapshotConfiguration, byte[]>();
@@ -122,17 +122,19 @@ namespace VISABConnector.Unity
             if (resource == null)
                 throw new Exception($"Could not load prefab from path {config.PrefabPath}");
 
-            var gameObject = GameObject.Instantiate(resource, position: config.SpawnLocation, rotation: config.SpawnRotation) as GameObject;
+            var gameObject = GameObject.Instantiate(resource, position: config.SpawnLocation, rotation: Quaternion.Euler(config.SpawnRotation)) as GameObject;
             if (gameObject == null)
                 throw new Exception($"Could not instantiate GameObject!");
 
             gameObject.SetActive(true);
 
+            config.AfterInstantiation?.Invoke(gameObject);
+
             return gameObject;
         }
 
         /// <summary>
-        /// Assigns Layer to all children of gameobjects
+        /// Assigns Layer to all children of gameobject
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="layer"></param>
@@ -145,6 +147,59 @@ namespace VISABConnector.Unity
 
                 SetLayerRecursively(child.gameObject, layer);
             }
+        }
+
+
+        // Assigns layer to just child or parent (hence all children)
+
+        private static void ChangeLayer(GameObject obj, SnapshotConfiguration config, int layer)
+        {
+            if (config.HasChildComponents && config.ChildConfiguration.SnapAllChilds)
+            {
+                SetLayerRecursively(obj.transform.parent.gameObject, layer);
+            }
+            else
+            {
+                SetLayerRecursively(obj, layer);
+            }
+        }
+
+
+        // Creates and sets up camera accordingly
+
+        private static Camera CameraSetup(CameraConfiguration camConfig, String cullingLayer, CameraClearFlags clearFlags)
+        {
+            var cam = CameraCreator.CreateCamera();
+
+            cam.orthographic = camConfig.Orthographic;
+            cam.cullingMask = 1 << LayerMask.NameToLayer(cullingLayer);
+            cam.clearFlags = clearFlags;
+
+            if (camConfig.Orthographic)
+                cam.orthographicSize = camConfig.OrthographicSize;
+
+            return cam;
+        }
+
+
+        // Instantiates or grabs Game Object and/or its child object
+
+        private static GameObject GameObjectSetup(SnapshotConfiguration config)
+        {
+            GameObject gameObject;
+
+            if (config.HasChildComponents)
+            {
+                gameObject = InstantiateGameObject(config.InstantiationSettings).transform.Find(config.ChildConfiguration.ChildName).gameObject;
+            }
+            else
+            {
+                gameObject = config.ShouldInstantiate ? InstantiateGameObject(config.InstantiationSettings) : GameObject.Find(config.GameObjectId);
+                if (!config.ShouldInstantiate && gameObject == null)
+                    throw new Exception($"There is no GameObject with name {config.GameObjectId}!");
+            }
+
+            return gameObject;
         }
     }
 }
