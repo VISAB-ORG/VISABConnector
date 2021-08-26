@@ -6,17 +6,20 @@ using UnityEngine;
 namespace VISABConnector.Unity
 {
     /// <summary>
-    /// TODO: Smart Instantiate
+    /// Class that unifies the methods in order to be able to snapshot any game item out of unity
     /// </summary>
     public static class ImageCreator
     {
+        /// <summary>
+        /// The VISAB layer variable which is assigned to every game object that will be snapshotted
+        /// </summary>
         public const string VISABLayerName = "VISAB";
 
         /// <summary>
-        /// TODO: A bunch of dumb arguments checking TODO: You may also pass an existing camera.
+        /// The actual method that conducts the snapshotting of game objects. It is calibrated by passing a config object to it
         /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
+        /// <param name="config">The config object that handles the specific requirements for snapping certain game objects</param>
+        /// <returns>A byte array which can be converted to a PNG-file or inserted into a JSON-File</returns>
         public static byte[] TakeSnapshot(SnapshotConfiguration config)
         {
             if (config == null)
@@ -66,6 +69,8 @@ namespace VISABConnector.Unity
 
             return imageBytes;
         }
+        
+        // Creates a texture on which the game object's snapshot will be copied to
 
         private static Texture2D MakeTexture(Camera camera, int width, int height)
         {
@@ -87,10 +92,10 @@ namespace VISABConnector.Unity
         }
 
         /// <summary>
-        /// TODO: You may also pass an existing camera.
+        /// Conduct several snapshots at once
         /// </summary>
-        /// <param name="configs"></param>
-        /// <returns></returns>
+        /// <param name="configs">The config objects you will need for the snapshots</param>
+        /// <returns>A dictionary which contains the byte arrays with their respective configuration objects</returns>
         public static IDictionary<SnapshotConfiguration, byte[]> TakeSnapshots(IEnumerable<SnapshotConfiguration> configs)
         {
             var snapshots = new Dictionary<SnapshotConfiguration, byte[]>();
@@ -144,13 +149,10 @@ namespace VISABConnector.Unity
             }
         }
 
-        /// <summary>
-        /// Assigns layer to just child or parent (hence all children)
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="config"></param>
-        /// <param name="layer"></param>
-        public static void ChangeLayer(GameObject obj, SnapshotConfiguration config, int layer)
+
+        // Assigns layer to just child or parent (hence all children)
+
+        private static void ChangeLayer(GameObject obj, SnapshotConfiguration config, int layer)
         {
             if (config.HasChildComponents && config.ChildConfiguration.SnapAllChilds)
             {
@@ -162,14 +164,10 @@ namespace VISABConnector.Unity
             }
         }
 
-        /// <summary>
-        /// Creates and sets up camera accordingly
-        /// </summary>
-        /// <param name="camConfig"></param>
-        /// <param name="cullingLayer"></param>
-        /// <param name="clearFlags"></param>
-        /// <returns></returns>
-        public static Camera CameraSetup(CameraConfiguration camConfig, String cullingLayer, CameraClearFlags clearFlags)
+
+        // Creates and sets up camera accordingly
+
+        private static Camera CameraSetup(CameraConfiguration camConfig, String cullingLayer, CameraClearFlags clearFlags)
         {
             var cam = CameraCreator.CreateCamera();
 
@@ -183,12 +181,10 @@ namespace VISABConnector.Unity
             return cam;
         }
 
-        /// <summary>
-        /// Instantiates or grabs Game Object and/or its child object
-        /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        public static GameObject GameObjectSetup(SnapshotConfiguration config)
+
+        // Instantiates or grabs Game Object and/or its child object
+
+        private static GameObject GameObjectSetup(SnapshotConfiguration config)
         {
             GameObject gameObject;
 
